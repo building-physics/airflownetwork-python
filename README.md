@@ -21,7 +21,7 @@ airflownetwork summarize my_model.epJSON
 To create a graph of the model in the DOT format:
 
 ```
-airflownetwork summarize my_model.epJSON
+airflownetwork graph my_model.epJSON
 ```
 
 To generate an audit of the model:
