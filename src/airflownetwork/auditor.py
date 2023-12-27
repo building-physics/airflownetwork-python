@@ -76,6 +76,15 @@ class BaseAuditor:
         else:
             self.json['messages'] = [mesg]
 
+def connectedness(dictionary, start):
+    connected_to = set()
+    current_list = dictionary.pop(start)
+    for name in current_list:
+        if name in dictionary:
+            connected_to.update(connectedness(dictionary, name))
+            connected_to.add(name)
+    return connected_to
+
 #
 # Local definitions
 #
@@ -448,6 +457,16 @@ class Auditor(BaseAuditor):
                     mesg += ', %d with greater than 32 external links' % way_too_many_external_links
                     mesg += ', model performance may suffer'
             self.add_messages(mesg)
+        
+        # Check connectedness of the model
+        neighbors = self.get_neighbors()
+        starter = next(iter(neighbors.keys()))
+        connected_to = connectedness(neighbors, starter)
+        # Check that the starter node is connected to the rest of the nodes,
+        # which will be true if the neighbors dictionary is empty
+        self.json['multizone connected'] = False
+        if not neighbors:
+            self.json['multizone connected'] = True
 
 if __name__ == '__main__':
     #
