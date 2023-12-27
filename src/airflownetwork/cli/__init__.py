@@ -13,6 +13,17 @@ def load_epjson(file):
         model = json_module.load(fp)
     return model
 
+def connectedness(dictionary, start):
+    #print(dictionary)
+    connected_to = set()
+    current_list = dictionary.pop(start)
+    #current_list = dictionary.pop(dictionary[start])
+    for name in current_list:
+        if name in dictionary:
+            connected_to.update(connectedness(dictionary, name))
+            connected_to.add(name)
+    return connected_to
+
 @click.command()
 @click.argument('epjson', type=click.Path(exists=True))
 @click.option('-j', '--json', is_flag=True, show_default=True, default=False, help='Write summary in JSON format.')
@@ -54,7 +65,19 @@ def audit(epjson, json, output, indent):
         click.echo('Failed to open epJSON file "%s": %s' % (epjson, str(exc)))
         return
     auditor = afn.Auditor(model)
+    # Run the original audit
     auditor.audit()
+
+    # Add the new checks
+    neighbors = auditor.get_neighbors()
+    expected_connected = len(neighbors) - 1
+    #print(neighbors)
+    starter = next(iter(neighbors.keys()))
+    connected_to = connectedness(neighbors, starter)
+    auditor.json['connected'] = True
+    if len(connected_to) == expected_connected:
+        auditor.json['connected'] = True
+    #print(starter, connected_to, neighbors)
 
     if json:
         if indent:

@@ -348,6 +348,19 @@ class Auditor(BaseAuditor):
                 
             surf['nodes'] = linked_nodes
         return True
+    
+    def get_neighbors(self):
+        if self.nodes == {} or self.external_nodes == {} or self.surfs == {}:
+            # This is not a super great way to get this done, should reconsider
+            self.__extract()
+            self.__connect_multizone()
+        dictionary = {}
+        for node in self.nodes.values():
+            dictionary[node['zone_name'].upper()] = [name.upper() for name in node['neighbors'].keys()]
+        for node_name, node in self.external_nodes.items():
+            dictionary[node_name] =  [name.upper() for name in node['neighbors'].keys()]
+        return dictionary
+
     def audit(self, **kwargs):
         if self.nodes == {} or self.external_nodes == {} or self.surfs == {}:
             # This is not a super great way to get this done, should reconsider
