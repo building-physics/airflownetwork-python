@@ -209,8 +209,8 @@ class Auditor(BaseAuditor):
 
         # Combine the internal nodes into a single dictionary
         self.internal_nodes = {}
-        for key,value in self.multizone_nodes.items():
-            self.internal_nodes[key] = value
+        for value in self.multizone_nodes.values():
+            self.internal_nodes[value['zone_name']] = value
         for key,value in self.distribution_nodes.items():
             self.internal_nodes[key] = value
         return True
@@ -269,17 +269,25 @@ class Auditor(BaseAuditor):
     def __connect_distribution(self):
         for name, node in self.distribution_nodes.items():
             node['link_count'] = 0
-            #node['external_connections'] = 0
+            node['external_connections'] = 0 # not currently implemented
+            node['distribution_connections'] = 0
             node['neighbors'] = {}
+            node['is_distribution'] = True
         for name, link in self.distribution_links.items():
             node_names = (link['node_1_name'], link['node_2_name'])
             for node_name in node_names:
                 self.internal_nodes[node_name]['link_count'] += 1
             # Count the numbers of connections
+            self.internal_nodes[node_names[1]]['link_count'] += 1
+            if self.internal_nodes[node_names[0]]['is_distribution']:
+                self.internal_nodes[node_names[1]]['distribution_connections'] += 1
             if node_names[0] in self.internal_nodes[node_names[1]]['neighbors']:
                 self.internal_nodes[node_names[1]]['neighbors'][node_names[0]] += 1
             else:
                 self.internal_nodes[node_names[1]]['neighbors'][node_names[0]] = 1
+            self.internal_nodes[node_names[0]]['link_count'] += 1
+            if self.internal_nodes[node_names[1]]['is_distribution']:
+                self.internal_nodes[node_names[0]]['distribution_connections'] += 1
             if node_names[1] in self.internal_nodes[node_names[0]]['neighbors']:
                 self.internal_nodes[node_names[0]]['neighbors'][node_names[1]] += 1
             else:
@@ -290,7 +298,9 @@ class Auditor(BaseAuditor):
         for name, node in self.multizone_nodes.items():
             node['link_count'] = 0
             node['external_connections'] = 0
+            node['distribution_connections'] = 0
             node['neighbors'] = {}
+            node['is_distribution'] = False
 
         for name, node in self.external_nodes.items():
             node['link_count'] = 0
@@ -391,10 +401,18 @@ class Auditor(BaseAuditor):
             surf['nodes'] = linked_nodes
         return True
     
-    def get_neighbors(self):
+    def get_neighbors(self, no_distribution=True):
+        # The input no_distribution is different than the member var so that just the multizone
+        # neighbors can be collected even if there is distribution.
         dictionary = {}
-        for node in self.multizone_nodes.values():
-            dictionary[node['zone_name'].upper()] = [name.upper() for name in node['neighbors'].keys()]
+        # Need to handle this all better, this is required to handle the zone/node naming issue
+        node_dict = self.multizone_nodes
+        rename=lambda key, value: value['zone_name']
+        if not no_distribution:
+            node_dict = self.internal_nodes
+            rename=lambda key, value: key
+        for node_name, node in node_dict.items():
+            dictionary[rename(node_name, node).upper()] = [name.upper() for name in node['neighbors'].keys()]
         for node_name, node in self.external_nodes.items():
             dictionary[node_name] =  [name.upper() for name in node['neighbors'].keys()]
         return dictionary
@@ -409,13 +427,17 @@ class Auditor(BaseAuditor):
         #
         # Now we've got the links worked out, so proceed to looking at what was there
         #
+        node_dict = self.multizone_nodes
+        if not self.no_distribution:
+            node_dict = self.internal_nodes
         link_histogram = {}
         external_link_histogram = {}
+        distribution_link_histogram = {}
         max_link_node_name = None
         max_links = 0
         max_external_link_node_name = None
         max_external_links = 0
-        for name,node in self.multizone_nodes.items():
+        for name,node in node_dict.items():
             if node['link_count'] > max_links:
                 max_link_node_name = name
                 max_links = node['link_count']
@@ -430,6 +452,10 @@ class Auditor(BaseAuditor):
                 external_link_histogram[node['external_connections']] += 1
             else:
                 external_link_histogram[node['external_connections']] = 1
+            if node['distribution_connections'] in distribution_link_histogram:
+                distribution_link_histogram[node['distribution_connections']] += 1
+            else:
+                distribution_link_histogram[node['distribution_connections']] = 1
 
         #
         # For a simple brick zone, 6 multizone links would connect it to all neighbors.
@@ -463,12 +489,13 @@ class Auditor(BaseAuditor):
         #
         # Machine-readable output of the link counts
         #
+        self.json['distribution_link_histogram'] = distribution_link_histogram
         self.json['multizone_link_histogram'] = link_histogram
-        self.json['max_multizone_links'] = {'zone' : self.multizone_nodes[max_link_node_name]['zone_name'],
+        self.json['max_multizone_links'] = {'zone' : node_dict[max_link_node_name]['zone_name'],
                                             'afn_zone' : max_link_node_name,
                                             'count' : max_links}
         self.json['external_link_histogram'] = external_link_histogram
-        self.json['max_external_links'] = {'zone' : self.multizone_nodes[max_external_link_node_name]['zone_name'],
+        self.json['max_external_links'] = {'zone' : node_dict[max_external_link_node_name]['zone_name'],
                                            'afn_zone' : max_external_link_node_name,
                                             'count' : max_external_links}
         if large_links > 0:
@@ -503,16 +530,36 @@ class Auditor(BaseAuditor):
             self.json['duplicate distribution nodes'] = False
             if duplicates:
                 self.json['duplicate distribution nodes'] = True
-        
-        # Check connectedness of the model
+
+        #
+        # Check connectedness of the model, first multizone only
+        #
         neighbors = self.get_neighbors()
         starter = next(iter(neighbors.keys()))
         connected_to = connectedness(neighbors, starter)
+        #print(starter, connected_to)
         # Check that the starter node is connected to the rest of the nodes,
         # which will be true if the neighbors dictionary is empty
         self.json['multizone connected'] = False
         if not neighbors:
             self.json['multizone connected'] = True
+
+        #
+        # Check distribution if needed
+        #
+        self.json['connected'] = self.json['multizone connected']
+        #print(self.internal_nodes.keys())
+        if not self.no_distribution:
+            neighbors = self.get_neighbors(no_distribution=False)
+            #print(neighbors.keys())
+            starter = next(iter(neighbors.keys()))
+            connected_to = connectedness(neighbors, starter)
+            #print(starter, connected_to)
+            # Check that the starter node is connected to the rest of the nodes,
+            # which will be true if the neighbors dictionary is empty
+            self.json['connected'] = False
+            if not neighbors:
+                self.json['connected'] = True
 
 if __name__ == '__main__':
     #
