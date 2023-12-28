@@ -138,6 +138,7 @@ class Auditor(BaseAuditor):
         self.nodes = {}
         self.external_nodes = {}
         self.distribution_nodes = {}
+        self.distribution_links = {}
         self.surfs = {}
         self.wpcs = {}
         self.refconds = {}
@@ -154,18 +155,20 @@ class Auditor(BaseAuditor):
                 self.vertex_ccw = False
         if self.__extract():
             self.__connect_multizone()
+            self.__connect_distribution()
     def __extract(self):
-        lookup = {'AirflowNetwork:MultiZone:Zone':self.nodes,
-                  'AirflowNetwork:MultiZone:Surface':self.surfs,
-                  'AirflowNetwork:MultiZone:ReferenceCrackConditions':self.refconds,
-                  'AirflowNetwork:MultiZone:Surface:Crack':self.afes,
-                  'AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea':self.afes,
-                  'AirflowNetwork:MultiZone:Component:DetailedOpening':self.afes,
-                  'AirflowNetwork:MultiZone:Component:SimpleOpening':self.afes,
-                  'AirflowNetwork:MultiZone:Component:HorizontalOpening':self.afes,
-                  'AirflowNetwork:MultiZone:Component:ZoneExhaustFan':self.afes,
-                  'AirflowNetwork:MultiZone:ExternalNode':self.external_nodes,
-                  'AirflowNetwork:Distribution:Node':self.distribution_nodes,
+        lookup = {'AirflowNetwork:MultiZone:Zone': self.nodes,
+                  'AirflowNetwork:MultiZone:Surface': self.surfs,
+                  'AirflowNetwork:MultiZone:ReferenceCrackConditions': self.refconds,
+                  'AirflowNetwork:MultiZone:Surface:Crack': self.afes,
+                  'AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea': self.afes,
+                  'AirflowNetwork:MultiZone:Component:DetailedOpening': self.afes,
+                  'AirflowNetwork:MultiZone:Component:SimpleOpening': self.afes,
+                  'AirflowNetwork:MultiZone:Component:HorizontalOpening': self.afes,
+                  'AirflowNetwork:MultiZone:Component:ZoneExhaustFan': self.afes,
+                  'AirflowNetwork:MultiZone:ExternalNode': self.external_nodes,
+                  'AirflowNetwork:Distribution:Node': self.distribution_nodes,
+                  'AirflowNetwork:Distribution:Linkage': self.distribution_links
                   #'AirflowNetwork:IntraZone:Node':self.nodes
                   }
         # Load the simcontrol object
@@ -251,7 +254,26 @@ class Auditor(BaseAuditor):
         messages = self.json.get('messages', [])
         for mesg in messages:
             lines.append(mesg)
-        return lines      
+        return lines
+
+    def __connect_distribution(self):
+        for name, node in self.distribution_nodes.items():
+            node['link_count'] = 0
+            #node['external_connections'] = 0
+            node['neighbors'] = {}
+        for name, link in self.distribution_links.items():
+            node_names = (link['node_1_name'], link['node_2_name'])
+            for node_name in node_names:
+                self.distribution_nodes[node_name]['link_count'] += 1
+            # Count the numbers of connections
+            if node_names[0] in self.distribution_nodes[node_names[1]]['neighbors']:
+                self.distribution_nodes[node_names[1]]['neighbors'][node_names[0]] += 1
+            else:
+                self.distribution_nodes[node_names[1]]['neighbors'][node_names[0]] = 1
+            if node_names[1] in self.distribution_nodes[node_names[0]]['neighbors']:
+                self.distribution_nodes[node_names[0]]['neighbors'][node_names[1]] += 1
+            else:
+                self.distribution_nodes[node_names[0]]['neighbors'][node_names[1]] = 1
             
     def __connect_multizone(self):
         # Link surfaces to nodes, need to automate this better at some point
@@ -364,6 +386,7 @@ class Auditor(BaseAuditor):
             # This is not a super great way to get this done, should reconsider
             self.__extract()
             self.__connect_multizone()
+            self.__connect_distribution()
         dictionary = {}
         for node in self.nodes.values():
             dictionary[node['zone_name'].upper()] = [name.upper() for name in node['neighbors'].keys()]
@@ -376,7 +399,7 @@ class Auditor(BaseAuditor):
             # This is not a super great way to get this done, should reconsider
             self.__extract()
             self.__connect_multizone()
-
+            self.__connect_distribution()
         #
         # Now we've got the links worked out, so proceed to looking at what was there
         #
@@ -432,7 +455,7 @@ class Auditor(BaseAuditor):
                 way_too_many_external_links += v
 
         #
-        # Machine-readable output
+        # Machine-readable output of the link counts
         #
         self.json['multizone_link_histogram'] = link_histogram
         self.json['max_multizone_links'] = {'zone' : self.nodes[max_link_node_name]['zone_name'],
