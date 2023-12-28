@@ -137,6 +137,7 @@ class Auditor(BaseAuditor):
         super().__init__(model)
         self.nodes = {}
         self.external_nodes = {}
+        self.distribution_nodes = {}
         self.surfs = {}
         self.wpcs = {}
         self.refconds = {}
@@ -164,7 +165,7 @@ class Auditor(BaseAuditor):
                   'AirflowNetwork:MultiZone:Component:HorizontalOpening':self.afes,
                   'AirflowNetwork:MultiZone:Component:ZoneExhaustFan':self.afes,
                   'AirflowNetwork:MultiZone:ExternalNode':self.external_nodes,
-                  #'AirflowNetwork:Distribution:Node':self.nodes,
+                  'AirflowNetwork:Distribution:Node':self.distribution_nodes,
                   #'AirflowNetwork:IntraZone:Node':self.nodes
                   }
         # Load the simcontrol object
@@ -457,6 +458,21 @@ class Auditor(BaseAuditor):
                     mesg += ', %d with greater than 32 external links' % way_too_many_external_links
                     mesg += ', model performance may suffer'
             self.add_messages(mesg)
+
+        #
+        # Check that distribution nodes are all pointing to different components
+        #
+        duplicates = []
+        used_components = {}
+        for name, node in self.distribution_nodes.items():
+            if 'component_name_or_node_name' in node:
+                if node['component_name_or_node_name'] in used_components:
+                    duplicates.append((name, used_components[node['component_name_or_node_name']]))
+                else:
+                    used_components[node['component_name_or_node_name']] = name
+        self.json['duplicate distribution nodes'] = False
+        if duplicates:
+            self.json['duplicate distribution nodes'] = True
         
         # Check connectedness of the model
         neighbors = self.get_neighbors()
