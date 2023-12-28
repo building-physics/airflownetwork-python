@@ -133,9 +133,10 @@ multizone_component_names = ['AirflowNetwork:MultiZone:Surface:Crack',
                              'AirflowNetwork:MultiZone:Component:ZoneExhaustFan']
 
 class Auditor(BaseAuditor):
-    def __init__(self, model):
+    def __init__(self, model, no_distribution=False):
         super().__init__(model)
-        self.nodes = {}
+        self.internal_nodes = {}
+        self.multizone_nodes = {}
         self.external_nodes = {}
         self.distribution_nodes = {}
         self.distribution_links = {}
@@ -145,6 +146,7 @@ class Auditor(BaseAuditor):
         self.afes = {}
         self.relative_geometry = False
         self.vertex_ccw = True
+        self.no_distribution = no_distribution
         # Figure out what is what
         if 'GlobalGeometryRules' in self.model:
             obj = next(iter(self.model['GlobalGeometryRules'].values()))
@@ -154,10 +156,11 @@ class Auditor(BaseAuditor):
             if 'vertex_entry_direction' == 'ClockWise':
                 self.vertex_ccw = False
         if self.__extract():
-            self.__connect_multizone()
-            self.__connect_distribution()
+            if self.__connect_multizone():
+                if not self.no_distribution:
+                    self.__connect_distribution()
     def __extract(self):
-        lookup = {'AirflowNetwork:MultiZone:Zone': self.nodes,
+        lookup = {'AirflowNetwork:MultiZone:Zone': self.multizone_nodes,
                   'AirflowNetwork:MultiZone:Surface': self.surfs,
                   'AirflowNetwork:MultiZone:ReferenceCrackConditions': self.refconds,
                   'AirflowNetwork:MultiZone:Surface:Crack': self.afes,
@@ -175,7 +178,7 @@ class Auditor(BaseAuditor):
         try:
             self.simcontrol = self.model['AirflowNetwork:SimulationControl']
         except KeyError:
-            self.add_message('Model does not contain a AirflowNetwork:SimulationControl object, aborting audit')
+            self.add_message('Model does not contain an AirflowNetwork:SimulationControl object, aborting audit')
             return False
         # Handle the wind pressure coefficients, should maybe remove these from the model once we're done
         try:
@@ -203,10 +206,17 @@ class Auditor(BaseAuditor):
                 thedict = lookup[key]
                 for k,v in self.model[key].items():
                     thedict[k] = v
+
+        # Combine the internal nodes into a single dictionary
+        self.internal_nodes = {}
+        for key,value in self.multizone_nodes.items():
+            self.internal_nodes[key] = value
+        for key,value in self.distribution_nodes.items():
+            self.internal_nodes[key] = value
         return True
     
     def summarize_model(self, json_output=False):
-        lookup = {'"AirflowNetwork:MultiZone:Zone"':self.nodes,
+        lookup = {'"AirflowNetwork:MultiZone:Zone"':self.multizone_nodes,
                   '"AirflowNetwork:MultiZone:Surface"':self.surfs,
                   '"AirflowNetwork:MultiZone:ReferenceCrackConditions"':self.refconds,
                   'airflow element':self.afes,
@@ -219,7 +229,7 @@ class Auditor(BaseAuditor):
         return lines
         
     def write_dot(self, fp):
-        if self.nodes == []:
+        if self.multizone_nodes == []:
             self.add_message('Warning: graph output not produced because no nodes were found')
             return
         if self.surfs == []: # this isn't quite right, but good enough for now
@@ -234,7 +244,7 @@ class Auditor(BaseAuditor):
             node['display_name'] = 'E%d' % count
             count += 1
         count = 0
-        for name, node in self.nodes.items():
+        for name, node in self.multizone_nodes.items():
             node['display_name'] = 'I%d' % count
             count += 1
 
@@ -264,20 +274,20 @@ class Auditor(BaseAuditor):
         for name, link in self.distribution_links.items():
             node_names = (link['node_1_name'], link['node_2_name'])
             for node_name in node_names:
-                self.distribution_nodes[node_name]['link_count'] += 1
+                self.internal_nodes[node_name]['link_count'] += 1
             # Count the numbers of connections
-            if node_names[0] in self.distribution_nodes[node_names[1]]['neighbors']:
-                self.distribution_nodes[node_names[1]]['neighbors'][node_names[0]] += 1
+            if node_names[0] in self.internal_nodes[node_names[1]]['neighbors']:
+                self.internal_nodes[node_names[1]]['neighbors'][node_names[0]] += 1
             else:
-                self.distribution_nodes[node_names[1]]['neighbors'][node_names[0]] = 1
-            if node_names[1] in self.distribution_nodes[node_names[0]]['neighbors']:
-                self.distribution_nodes[node_names[0]]['neighbors'][node_names[1]] += 1
+                self.internal_nodes[node_names[1]]['neighbors'][node_names[0]] = 1
+            if node_names[1] in self.internal_nodes[node_names[0]]['neighbors']:
+                self.internal_nodes[node_names[0]]['neighbors'][node_names[1]] += 1
             else:
-                self.distribution_nodes[node_names[0]]['neighbors'][node_names[1]] = 1
+                self.internal_nodes[node_names[0]]['neighbors'][node_names[1]] = 1
             
     def __connect_multizone(self):
         # Link surfaces to nodes, need to automate this better at some point
-        for name, node in self.nodes.items():
+        for name, node in self.multizone_nodes.items():
             node['link_count'] = 0
             node['external_connections'] = 0
             node['neighbors'] = {}
@@ -329,7 +339,7 @@ class Auditor(BaseAuditor):
                 zone_name = htsurf['zone_name']
                 # Find the multizone zone that points at this zone
                 afnzone = None
-                for name,node in self.nodes.items():
+                for name,node in self.multizone_nodes.items():
                     if node['zone_name'] == zone_name:
                         afnzone = node
                         node['link_count'] += 1
@@ -350,7 +360,7 @@ class Auditor(BaseAuditor):
                 zone_name = htsurf['zone_name']
                 # Find the multizone zone that points at this zone
                 afnzone = None
-                for name,node in self.nodes.items():
+                for name,node in self.multizone_nodes.items():
                     if node['zone_name'] == zone_name:
                         afnzone = node
                         node['link_count'] += 1
@@ -361,7 +371,7 @@ class Auditor(BaseAuditor):
                 adjhtsurf = htsurfs[htsurf['outside_boundary_condition_object']]
                 adj_zone_name = adjhtsurf['zone_name']
                 adj_afnzone = None
-                for name,node in self.nodes.items():
+                for name,node in self.multizone_nodes.items():
                     if node['zone_name'] == adj_zone_name:
                         adj_afnzone = node
                         node['link_count'] += 1
@@ -382,24 +392,20 @@ class Auditor(BaseAuditor):
         return True
     
     def get_neighbors(self):
-        if self.nodes == {} or self.external_nodes == {} or self.surfs == {}:
-            # This is not a super great way to get this done, should reconsider
-            self.__extract()
-            self.__connect_multizone()
-            self.__connect_distribution()
         dictionary = {}
-        for node in self.nodes.values():
+        for node in self.multizone_nodes.values():
             dictionary[node['zone_name'].upper()] = [name.upper() for name in node['neighbors'].keys()]
         for node_name, node in self.external_nodes.items():
             dictionary[node_name] =  [name.upper() for name in node['neighbors'].keys()]
         return dictionary
 
     def audit(self, **kwargs):
-        if self.nodes == {} or self.external_nodes == {} or self.surfs == {}:
+        if self.multizone_nodes == {} or self.external_nodes == {} or self.surfs == {}:
             # This is not a super great way to get this done, should reconsider
-            self.__extract()
-            self.__connect_multizone()
-            self.__connect_distribution()
+            if self.__extract():
+                if self.__connect_multizone():
+                    if not self.no_distribution:
+                        self.__connect_distribution()
         #
         # Now we've got the links worked out, so proceed to looking at what was there
         #
@@ -409,7 +415,7 @@ class Auditor(BaseAuditor):
         max_links = 0
         max_external_link_node_name = None
         max_external_links = 0
-        for name,node in self.nodes.items():
+        for name,node in self.multizone_nodes.items():
             if node['link_count'] > max_links:
                 max_link_node_name = name
                 max_links = node['link_count']
@@ -458,11 +464,11 @@ class Auditor(BaseAuditor):
         # Machine-readable output of the link counts
         #
         self.json['multizone_link_histogram'] = link_histogram
-        self.json['max_multizone_links'] = {'zone' : self.nodes[max_link_node_name]['zone_name'],
+        self.json['max_multizone_links'] = {'zone' : self.multizone_nodes[max_link_node_name]['zone_name'],
                                             'afn_zone' : max_link_node_name,
                                             'count' : max_links}
         self.json['external_link_histogram'] = external_link_histogram
-        self.json['max_external_links'] = {'zone' : self.nodes[max_external_link_node_name]['zone_name'],
+        self.json['max_external_links'] = {'zone' : self.multizone_nodes[max_external_link_node_name]['zone_name'],
                                            'afn_zone' : max_external_link_node_name,
                                             'count' : max_external_links}
         if large_links > 0:
@@ -485,17 +491,18 @@ class Auditor(BaseAuditor):
         #
         # Check that distribution nodes are all pointing to different components
         #
-        duplicates = []
-        used_components = {}
-        for name, node in self.distribution_nodes.items():
-            if 'component_name_or_node_name' in node:
-                if node['component_name_or_node_name'] in used_components:
-                    duplicates.append((name, used_components[node['component_name_or_node_name']]))
-                else:
-                    used_components[node['component_name_or_node_name']] = name
-        self.json['duplicate distribution nodes'] = False
-        if duplicates:
-            self.json['duplicate distribution nodes'] = True
+        if not self.no_distribution:
+            duplicates = []
+            used_components = {}
+            for name, node in self.distribution_nodes.items():
+                if 'component_name_or_node_name' in node:
+                    if node['component_name_or_node_name'] in used_components:
+                        duplicates.append((name, used_components[node['component_name_or_node_name']]))
+                    else:
+                        used_components[node['component_name_or_node_name']] = name
+            self.json['duplicate distribution nodes'] = False
+            if duplicates:
+                self.json['duplicate distribution nodes'] = True
         
         # Check connectedness of the model
         neighbors = self.get_neighbors()
@@ -551,13 +558,13 @@ if __name__ == '__main__':
             count += 1
 
         count = 0
-        for name, node in auditor.nodes.items():
+        for name, node in auditor.multizone_nodes.items():
             node['display_name'] = 'I%d' % count
             count += 1
 
         args.graph.write('graph linkages {\n')
         for name, surf in auditor.surfs.items():
-            args.graph.write('%s -- %s\n' % (surf.nodes[0]['display_name'],
-                                             surf.nodes[1]['display_name']))
+            args.graph.write('%s -- %s\n' % (surf.multizone_nodes[0]['display_name'],
+                                             surf.multizone_nodes[1]['display_name']))
         args.graph.write('}\n')
         args.graph.close()

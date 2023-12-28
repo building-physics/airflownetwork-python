@@ -47,13 +47,14 @@ def graph(epjson, output):
 @click.option('-j', '--json', is_flag=True, show_default=True, default=False, help='Write summary in JSON format.')
 @click.option('-o', '--output', type=click.File('w'), show_default=True, default='-', help='File name to write.')
 @click.option('-i', '--indent', show_default=True, default=0, help='Indent JSON output.')
-def audit(epjson, json, output, indent):
+@click.option('--no-distribution', is_flag=True, show_default=True, default=False, help='Do not evaluate distribution, even if present.')
+def audit(epjson, json, output, indent, no_distribution):
     try:
         model = load_epjson(epjson)
     except Exception as exc:
         click.echo('Failed to open epJSON file "%s": %s' % (epjson, str(exc)))
         return
-    auditor = afn.Auditor(model)
+    auditor = afn.Auditor(model, no_distribution=no_distribution)
     # Run the audit
     auditor.audit()
 
