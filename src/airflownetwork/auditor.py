@@ -147,6 +147,7 @@ class Auditor(BaseAuditor):
         self.relative_geometry = False
         self.vertex_ccw = True
         self.no_distribution = no_distribution
+        self.has_intrazone = False
         # Figure out what is what
         if 'GlobalGeometryRules' in self.model:
             obj = next(iter(self.model['GlobalGeometryRules'].values()))
@@ -180,6 +181,9 @@ class Auditor(BaseAuditor):
         except KeyError:
             self.add_message('Model does not contain an AirflowNetwork:SimulationControl object, aborting audit')
             return False
+        # Check for intrazone links and nodes
+        self.has_intrazone = (('AirflowNetwork:IntraZone:Node' in self.model) and 
+                              ('AirflowNetwork:IntraZone:Linkage' in self.model))
         # Handle the wind pressure coefficients, should maybe remove these from the model once we're done
         try:
             wpa = next(iter(self.model['AirflowNetwork:MultiZone:WindPressureCoefficientArray'].values()))
@@ -321,13 +325,13 @@ class Auditor(BaseAuditor):
             try:
                 htsurf = htsurfs[surf['surface_name']]
             except KeyError:
-                raise auditor.BadModel('Failed to find heat transfer surface for AirflowNetwork surface "' + name + '"')
+                raise BadModel('Failed to find heat transfer surface for AirflowNetwork surface "' + name + '"')
             if 'building_surface_name' in htsurf:
                 window = htsurf
                 try:
                     htsurf = htsurfs[window['building_surface_name']]
                 except KeyError:
-                    raise auditor.BadModel('Failed to find window heat transfer surface for AirflowNetwork surface "' + name + '"')
+                    raise BadModel('Failed to find window heat transfer surface for AirflowNetwork surface "' + name + '"')
 
             bc = htsurf['outside_boundary_condition']
 
@@ -344,7 +348,7 @@ class Auditor(BaseAuditor):
                 try:
                     external_node = self.external_nodes[external_node_name]
                 except KeyError:
-                    raise auditor.BadModel('Failed to find external node "' + external_node_name + '" for AirflowNetwork surface "' + name + '"')
+                    raise BadModel('Failed to find external node "' + external_node_name + '" for AirflowNetwork surface "' + name + '"')
                 external_node['link_count'] += 1
                 zone_name = htsurf['zone_name']
                 # Find the multizone zone that points at this zone
@@ -364,7 +368,7 @@ class Auditor(BaseAuditor):
                             external_node['neighbors'][zone_name] = 1
                         break
                 if afnzone == None:
-                    raise auditor.BadModel('Failed to find AirflowNetwork zone for thermal zone "' + zone_name + '"')
+                    raise BadModel('Failed to find AirflowNetwork zone for thermal zone "' + zone_name + '"')
                 linked_nodes = [afnzone, external_node]
             elif bc == 'Surface':
                 zone_name = htsurf['zone_name']
@@ -376,7 +380,7 @@ class Auditor(BaseAuditor):
                         node['link_count'] += 1
                         break
                 if afnzone == None:
-                    raise auditor.BadModel('Failed to find AirflowNetwork zone for thermal zone "' + zone_name + '"')
+                    raise BadModel('Failed to find AirflowNetwork zone for thermal zone "' + zone_name + '"')
                 linked_nodes = [afnzone]
                 adjhtsurf = htsurfs[htsurf['outside_boundary_condition_object']]
                 adj_zone_name = adjhtsurf['zone_name']
@@ -387,7 +391,7 @@ class Auditor(BaseAuditor):
                         node['link_count'] += 1
                         break
                 if adj_afnzone == None:
-                    raise auditor.BadModel('Failed to find AirflowNetwork zone for adjacent thermal zone "' + adj_zone_name + '"')
+                    raise BadModel('Failed to find AirflowNetwork zone for adjacent thermal zone "' + adj_zone_name + '"')
                 linked_nodes.append(adj_afnzone)
                 if adj_zone_name in afnzone['neighbors']:
                     afnzone['neighbors'][adj_zone_name] += 1
@@ -531,87 +535,38 @@ class Auditor(BaseAuditor):
             if duplicates:
                 self.json['duplicate distribution nodes'] = True
 
-        #
-        # Check connectedness of the model, first multizone only
-        #
-        neighbors = self.get_neighbors()
-        starter = next(iter(neighbors.keys()))
-        connected_to = connectedness(neighbors, starter)
-        #print(starter, connected_to)
-        # Check that the starter node is connected to the rest of the nodes,
-        # which will be true if the neighbors dictionary is empty
-        self.json['multizone connected'] = False
-        if not neighbors:
-            self.json['multizone connected'] = True
-
-        #
-        # Check distribution if needed
-        #
-        self.json['connected'] = self.json['multizone connected']
-        #print(self.internal_nodes.keys())
-        if not self.no_distribution:
-            neighbors = self.get_neighbors(no_distribution=False)
-            #print(neighbors.keys())
+        if not self.has_intrazone:
+            #
+            # Check connectedness of the model, first multizone only
+            #
+            neighbors = self.get_neighbors()
             starter = next(iter(neighbors.keys()))
             connected_to = connectedness(neighbors, starter)
             #print(starter, connected_to)
             # Check that the starter node is connected to the rest of the nodes,
             # which will be true if the neighbors dictionary is empty
-            self.json['connected'] = False
-            if not neighbors:
+            self.json['multizone connected'] = True
+            if neighbors:
+                self.json['multizone connected'] = False
+                self.add_message('Multizone network is not fully connected')
+
+            #
+            # Check distribution if needed
+            #
+            self.json['connected'] = self.json['multizone connected']
+            #print(self.internal_nodes.keys())
+            if not self.no_distribution:
+                neighbors = self.get_neighbors(no_distribution=False)
+                #print(neighbors.keys())
+                starter = next(iter(neighbors.keys()))
+                connected_to = connectedness(neighbors, starter)
+                #print(starter, connected_to)
+                # Check that the starter node is connected to the rest of the nodes,
+                # which will be true if the neighbors dictionary is empty
                 self.json['connected'] = True
+                if not neighbors:
+                    self.json['connected'] = False
+                    self.add_message('Network (multizone + distribution) is not fully connected')
 
-if __name__ == '__main__':
-    #
-    # The main body of the script, do argument processing first
-    #
-    parser = argparse.ArgumentParser(description='AirflowNetwork model audit script')
-    #args.add_argument('-g', '--graph', help='Generate a graphviz graph',
-    #                  default=False, action='store_true')
-    parser.add_argument('-g', '--graph', help='generate a graphviz .dot output file',
-                        dest='graph', metavar='dotfile', default=None,
-                        type=argparse.FileType('w'))
-    parser.add_argument('-p', '--pretty', help='write pretty JSON output',
-                        default=False, action='store_true')
-    parser.add_argument("json_file")
-
-    args = parser.parse_args()
-
-    fp = open(args.json_file, 'r')
-    model = json.load(fp)
-    fp.close()
-
-    auditor = Auditor(model)
-
-    auditor.audit()
-
-    #
-    # Now write it all out
-    #
-    indent = None
-    if args.pretty:
-        indent = 2
-
-    json.dump(auditor.json, sys.stdout, indent=indent)
-
-    if args.graph:
-        #
-        # Generate a graph
-        #
-        # Give nodes names for displaying
-        count = 0
-        for name, node in auditor.external_nodes.items():
-            node['display_name'] = 'E%d' % count
-            count += 1
-
-        count = 0
-        for name, node in auditor.multizone_nodes.items():
-            node['display_name'] = 'I%d' % count
-            count += 1
-
-        args.graph.write('graph linkages {\n')
-        for name, surf in auditor.surfs.items():
-            args.graph.write('%s -- %s\n' % (surf.multizone_nodes[0]['display_name'],
-                                             surf.multizone_nodes[1]['display_name']))
-        args.graph.write('}\n')
-        args.graph.close()
+        else:
+            self.add_message('Intrazone data found, skipping connectedness tests')
