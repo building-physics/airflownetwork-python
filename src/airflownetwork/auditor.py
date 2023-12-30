@@ -564,7 +564,7 @@ class Auditor(BaseAuditor):
                 # Check that the starter node is connected to the rest of the nodes,
                 # which will be true if the neighbors dictionary is empty
                 self.json['connected'] = True
-                if not neighbors:
+                if neighbors:
                     self.json['connected'] = False
                     self.add_message('Network (multizone + distribution) is not fully connected')
 
