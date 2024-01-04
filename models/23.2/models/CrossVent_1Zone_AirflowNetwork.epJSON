@@ -1,0 +1,1207 @@
+{
+    "AirflowNetwork:MultiZone:Component:DetailedOpening": {
+        "DCD": {
+            "air_mass_flow_coefficient_when_opening_is_closed": 1,
+            "air_mass_flow_exponent_when_opening_is_closed": 1,
+            "discharge_coefficient_for_opening_factor_1": 0.7,
+            "discharge_coefficient_for_opening_factor_2": 0.7,
+            "discharge_coefficient_for_opening_factor_3": 0,
+            "discharge_coefficient_for_opening_factor_4": 0,
+            "extra_crack_length_or_height_of_pivoting_axis": 0.0,
+            "height_factor_for_opening_factor_1": 0.85,
+            "height_factor_for_opening_factor_2": 0.9,
+            "height_factor_for_opening_factor_3": 0,
+            "height_factor_for_opening_factor_4": 0,
+            "number_of_sets_of_opening_factor_data": 2,
+            "opening_factor_1": 0,
+            "opening_factor_2": 1,
+            "opening_factor_3": 0,
+            "opening_factor_4": 0,
+            "start_height_factor_for_opening_factor_1": 0.01,
+            "start_height_factor_for_opening_factor_2": 0.01,
+            "start_height_factor_for_opening_factor_3": 0,
+            "start_height_factor_for_opening_factor_4": 0,
+            "type_of_rectangular_large_vertical_opening_lvo_": "NonPivoted",
+            "width_factor_for_opening_factor_1": 1,
+            "width_factor_for_opening_factor_2": 1,
+            "width_factor_for_opening_factor_3": 0,
+            "width_factor_for_opening_factor_4": 0
+        }
+    },
+    "AirflowNetwork:MultiZone:ExternalNode": {
+        "NoExt1": {
+            "external_node_height": 1.524,
+            "wind_pressure_coefficient_curve_name": "NoExt1_WPCValue"
+        },
+        "NoExt2": {
+            "external_node_height": 1.524,
+            "wind_pressure_coefficient_curve_name": "NoExt2_WPCValue"
+        }
+    },
+    "AirflowNetwork:MultiZone:ReferenceCrackConditions": {
+        "ReferenceCrackConditions": {
+            "reference_barometric_pressure": 100000,
+            "reference_humidity_ratio": 0.01,
+            "reference_temperature": 20.0
+        }
+    },
+    "AirflowNetwork:MultiZone:Surface": {
+        "AirflowNetwork:MultiZone:Surface 1": {
+            "external_node_name": "NoExt1",
+            "leakage_component_name": "DCD",
+            "surface_name": "ZONAWwin",
+            "window_door_opening_factor_or_crack_factor": 1.0
+        },
+        "AirflowNetwork:MultiZone:Surface 2": {
+            "external_node_name": "NoExt2",
+            "leakage_component_name": "DCD",
+            "surface_name": "ZONAEwin",
+            "window_door_opening_factor_or_crack_factor": 1.0
+        }
+    },
+    "AirflowNetwork:MultiZone:Surface:Crack": {
+        "ZonaCrack": {
+            "air_mass_flow_coefficient_at_reference_conditions": 1.0,
+            "air_mass_flow_exponent": 0.5,
+            "reference_crack_conditions": "ReferenceCrackConditions"
+        },
+        "ZonaCrack2": {
+            "air_mass_flow_coefficient_at_reference_conditions": 0.8,
+            "air_mass_flow_exponent": 0.5,
+            "reference_crack_conditions": "ReferenceCrackConditions"
+        }
+    },
+    "AirflowNetwork:MultiZone:WindPressureCoefficientArray": {
+        "CPM": {
+            "wind_direction_1": 0,
+            "wind_direction_2": 90,
+            "wind_direction_3": 180,
+            "wind_direction_4": 270,
+            "wind_direction_5": 360
+        }
+    },
+    "AirflowNetwork:MultiZone:WindPressureCoefficientValues": {
+        "NoExt1_WPCValue": {
+            "airflownetwork_multizone_windpressurecoefficientarray_name": "CPM",
+            "wind_pressure_coefficient_value_1": 1,
+            "wind_pressure_coefficient_value_2": 1,
+            "wind_pressure_coefficient_value_3": 1,
+            "wind_pressure_coefficient_value_4": 1,
+            "wind_pressure_coefficient_value_5": 1
+        },
+        "NoExt2_WPCValue": {
+            "airflownetwork_multizone_windpressurecoefficientarray_name": "CPM",
+            "wind_pressure_coefficient_value_1": 0,
+            "wind_pressure_coefficient_value_2": 0,
+            "wind_pressure_coefficient_value_3": 0,
+            "wind_pressure_coefficient_value_4": 0,
+            "wind_pressure_coefficient_value_5": 0
+        }
+    },
+    "AirflowNetwork:MultiZone:Zone": {
+        "AirflowNetwork:MultiZone:Zone 1": {
+            "indoor_and_outdoor_enthalpy_difference_lower_limit_for_maximum_venting_open_factor": 0.0,
+            "indoor_and_outdoor_enthalpy_difference_upper_limit_for_minimum_venting_open_factor": 300000.0,
+            "indoor_and_outdoor_temperature_difference_lower_limit_for_maximum_venting_open_factor": 0.0,
+            "indoor_and_outdoor_temperature_difference_upper_limit_for_minimum_venting_open_factor": 100.0,
+            "minimum_venting_open_factor": 1,
+            "ventilation_control_mode": "Constant",
+            "ventilation_control_zone_temperature_setpoint_schedule_name": "WindowVentSched",
+            "venting_availability_schedule_name": "ON",
+            "zone_name": "ZONA"
+        }
+    },
+    "AirflowNetwork:SimulationControl": {
+        "VENT": {
+            "absolute_airflow_convergence_tolerance": 1e-06,
+            "airflownetwork_control": "MultizoneWithoutDistribution",
+            "azimuth_angle_of_long_axis_of_building": 90.0,
+            "building_type": "LowRise",
+            "convergence_acceleration_limit": -0.5,
+            "height_selection_for_local_wind_pressure_calculation": "ExternalNode",
+            "initialization_type": "ZeroNodePressures",
+            "maximum_number_of_iterations": 500,
+            "ratio_of_building_width_along_short_axis_to_width_along_long_axis": 0.833,
+            "relative_airflow_convergence_tolerance": 1e-05,
+            "wind_pressure_coefficient_type": "Input"
+        }
+    },
+    "Building": {
+        "Teste": {
+            "loads_convergence_tolerance_value": 0.04,
+            "maximum_number_of_warmup_days": 25,
+            "minimum_number_of_warmup_days": 6,
+            "north_axis": 45,
+            "solar_distribution": "FullExteriorWithReflections",
+            "temperature_convergence_tolerance_value": 0.4,
+            "terrain": "City"
+        }
+    },
+    "BuildingSurface:Detailed": {
+        "ZONAC": {
+            "construction_name": "RoofConst",
+            "number_of_vertices": 4,
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Ceiling",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 4
+                }
+            ],
+            "view_factor_to_ground": 0.5,
+            "wind_exposure": "WindExposed",
+            "zone_name": "ZONA"
+        },
+        "ZONAE": {
+            "construction_name": "ExteriorWallConst",
+            "number_of_vertices": 4,
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "view_factor_to_ground": 0.5,
+            "wind_exposure": "WindExposed",
+            "zone_name": "ZONA"
+        },
+        "ZONAF": {
+            "construction_name": "FloorConst",
+            "number_of_vertices": 4,
+            "outside_boundary_condition": "Ground",
+            "sun_exposure": "NoSun",
+            "surface_type": "Floor",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "view_factor_to_ground": 0.5,
+            "wind_exposure": "NoWind",
+            "zone_name": "ZONA"
+        },
+        "ZONAN": {
+            "construction_name": "ExteriorWallConst",
+            "number_of_vertices": 4,
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "view_factor_to_ground": 0.5,
+            "wind_exposure": "WindExposed",
+            "zone_name": "ZONA"
+        },
+        "ZONAS": {
+            "construction_name": "ExteriorWallConst",
+            "number_of_vertices": 4,
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 6,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "view_factor_to_ground": 0.5,
+            "wind_exposure": "WindExposed",
+            "zone_name": "ZONA"
+        },
+        "ZONAW": {
+            "construction_name": "ExteriorWallConst",
+            "number_of_vertices": 4,
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 4
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 5,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "view_factor_to_ground": 0.5,
+            "wind_exposure": "WindExposed",
+            "zone_name": "ZONA"
+        }
+    },
+    "Construction": {
+        "ExteriorWallConst": {
+            "outside_layer": "Aluminum - 10cm"
+        },
+        "FloorConst": {
+            "outside_layer": "Aluminum - 10cm"
+        },
+        "RoofConst": {
+            "outside_layer": "Aluminum - 10cm"
+        },
+        "WindowConst": {
+            "layer_2": "WindowGas:Air - 1cm",
+            "layer_3": "Glass:Simple - 6mm",
+            "outside_layer": "Glass:Simple - 6mm"
+        }
+    },
+    "ElectricEquipment": {
+        "ZONA ElecEq 1": {
+            "design_level": 3000,
+            "design_level_calculation_method": "EquipmentLevel",
+            "fraction_latent": 0.0,
+            "fraction_lost": 0.0,
+            "fraction_radiant": 0.0,
+            "schedule_name": "ON",
+            "zone_or_zonelist_or_space_or_spacelist_name": "ZONA"
+        }
+    },
+    "FenestrationSurface:Detailed": {
+        "ZONAEwin": {
+            "building_surface_name": "ZONAE",
+            "construction_name": "WindowConst",
+            "multiplier": 1,
+            "number_of_vertices": 4,
+            "surface_type": "Window",
+            "vertex_1_x_coordinate": 6,
+            "vertex_1_y_coordinate": 2,
+            "vertex_1_z_coordinate": 2.5,
+            "vertex_2_x_coordinate": 6,
+            "vertex_2_y_coordinate": 3,
+            "vertex_2_z_coordinate": 2.5,
+            "vertex_3_x_coordinate": 6,
+            "vertex_3_y_coordinate": 3,
+            "vertex_3_z_coordinate": 1.5,
+            "vertex_4_x_coordinate": 6,
+            "vertex_4_y_coordinate": 2,
+            "vertex_4_z_coordinate": 1.5,
+            "view_factor_to_ground": 0.5
+        },
+        "ZONAWwin": {
+            "building_surface_name": "ZONAW",
+            "construction_name": "WindowConst",
+            "multiplier": 1,
+            "number_of_vertices": 4,
+            "surface_type": "Window",
+            "vertex_1_x_coordinate": 0,
+            "vertex_1_y_coordinate": 3,
+            "vertex_1_z_coordinate": 2.5,
+            "vertex_2_x_coordinate": 0,
+            "vertex_2_y_coordinate": 2,
+            "vertex_2_z_coordinate": 2.5,
+            "vertex_3_x_coordinate": 0,
+            "vertex_3_y_coordinate": 2,
+            "vertex_3_z_coordinate": 1.5,
+            "vertex_4_x_coordinate": 0,
+            "vertex_4_y_coordinate": 3,
+            "vertex_4_z_coordinate": 1.5,
+            "view_factor_to_ground": 0.5
+        }
+    },
+    "GlobalGeometryRules": {
+        "GlobalGeometryRules 1": {
+            "coordinate_system": "Relative",
+            "starting_vertex_position": "UpperLeftCorner",
+            "vertex_entry_direction": "Clockwise"
+        }
+    },
+    "HeatBalanceAlgorithm": {
+        "HeatBalanceAlgorithm 1": {
+            "algorithm": "ConductionTransferFunction"
+        }
+    },
+    "Lights": {
+        "ZONA Lights 1": {
+            "design_level_calculation_method": "LightingLevel",
+            "fraction_radiant": 0.5,
+            "lighting_level": 5000,
+            "schedule_name": "ON",
+            "zone_or_zonelist_or_space_or_spacelist_name": "ZONA"
+        }
+    },
+    "Material": {
+        "Aluminum - 2mm": {
+            "conductivity": 221.38,
+            "density": 2739.15,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.2,
+            "specific_heat": 890.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.002,
+            "visible_absorptance": 0.2
+        },
+        "Aluminum - 4mm": {
+            "conductivity": 221.38,
+            "density": 2739.15,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.2,
+            "specific_heat": 890.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.004,
+            "visible_absorptance": 0.2
+        },
+        "Aluminum - 6mm": {
+            "conductivity": 221.38,
+            "density": 2739.15,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.2,
+            "specific_heat": 890.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.006,
+            "visible_absorptance": 0.2
+        },
+        "Aluminum - 8mm": {
+            "conductivity": 221.38,
+            "density": 2739.15,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.2,
+            "specific_heat": 890.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.008,
+            "visible_absorptance": 0.2
+        },
+        "Aluminum - 10cm": {
+            "conductivity": 221.38,
+            "density": 2739.15,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.2,
+            "specific_heat": 890.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.1,
+            "visible_absorptance": 0.2
+        },
+        "Aluminum - 10mm": {
+            "conductivity": 221.38,
+            "density": 2739.15,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.2,
+            "specific_heat": 890.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.01,
+            "visible_absorptance": 0.2
+        },
+        "Gyp - 1cm": {
+            "conductivity": 0.16,
+            "density": 784.9,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.92,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.01,
+            "visible_absorptance": 0.92
+        },
+        "Gyp - 2cm": {
+            "conductivity": 0.16,
+            "density": 784.9,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.92,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.02,
+            "visible_absorptance": 0.92
+        },
+        "Gyp - 3cm": {
+            "conductivity": 0.16,
+            "density": 784.9,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.92,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.03,
+            "visible_absorptance": 0.92
+        },
+        "Gyp - 5cm": {
+            "conductivity": 0.16,
+            "density": 784.9,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.92,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.05,
+            "visible_absorptance": 0.92
+        },
+        "Gyp - 10cm": {
+            "conductivity": 0.16,
+            "density": 784.9,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.92,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.1,
+            "visible_absorptance": 0.92
+        },
+        "HW Concrete - 5cm": {
+            "conductivity": 1.72,
+            "density": 2242.58,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.05,
+            "visible_absorptance": 0.65
+        },
+        "HW Concrete - 10cm": {
+            "conductivity": 1.72,
+            "density": 2242.58,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.1,
+            "visible_absorptance": 0.65
+        },
+        "HW Concrete - 15cm": {
+            "conductivity": 1.72,
+            "density": 2242.58,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.15,
+            "visible_absorptance": 0.65
+        },
+        "HW Concrete - 20cm": {
+            "conductivity": 1.72,
+            "density": 2242.58,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.2,
+            "visible_absorptance": 0.65
+        },
+        "HW Concrete - 25cm": {
+            "conductivity": 1.72,
+            "density": 2242.58,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.25,
+            "visible_absorptance": 0.65
+        },
+        "HW Concrete - 30cm": {
+            "conductivity": 1.72,
+            "density": 2242.58,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.3,
+            "visible_absorptance": 0.65
+        },
+        "HW Concrete - 40cm": {
+            "conductivity": 1.72,
+            "density": 2242.58,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.4,
+            "visible_absorptance": 0.65
+        },
+        "HW Concrete - 50cm": {
+            "conductivity": 1.72,
+            "density": 2242.58,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.5,
+            "visible_absorptance": 0.65
+        },
+        "Insulator - 1cm": {
+            "conductivity": 0.04,
+            "density": 32.03,
+            "roughness": "VeryRough",
+            "solar_absorptance": 0.5,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.01,
+            "visible_absorptance": 0.5
+        },
+        "Insulator - 2cm": {
+            "conductivity": 0.04,
+            "density": 32.03,
+            "roughness": "VeryRough",
+            "solar_absorptance": 0.5,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.02,
+            "visible_absorptance": 0.5
+        },
+        "Insulator - 3cm": {
+            "conductivity": 0.04,
+            "density": 32.03,
+            "roughness": "VeryRough",
+            "solar_absorptance": 0.5,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.03,
+            "visible_absorptance": 0.5
+        },
+        "Insulator - 5cm": {
+            "conductivity": 0.04,
+            "density": 32.03,
+            "roughness": "VeryRough",
+            "solar_absorptance": 0.5,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.05,
+            "visible_absorptance": 0.5
+        },
+        "Insulator - 10cm": {
+            "conductivity": 0.04,
+            "density": 32.03,
+            "roughness": "VeryRough",
+            "solar_absorptance": 0.5,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.1,
+            "visible_absorptance": 0.5
+        },
+        "LW Concrete - 5cm": {
+            "conductivity": 0.57,
+            "density": 608.7,
+            "roughness": "Rough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.05,
+            "visible_absorptance": 0.65
+        },
+        "LW Concrete - 10cm": {
+            "conductivity": 0.57,
+            "density": 608.7,
+            "roughness": "Rough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.1,
+            "visible_absorptance": 0.65
+        },
+        "LW Concrete - 15cm": {
+            "conductivity": 0.57,
+            "density": 608.7,
+            "roughness": "Rough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.15,
+            "visible_absorptance": 0.65
+        },
+        "LW Concrete - 20cm": {
+            "conductivity": 0.57,
+            "density": 608.7,
+            "roughness": "Rough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.2,
+            "visible_absorptance": 0.65
+        },
+        "LW Concrete - 25cm": {
+            "conductivity": 0.57,
+            "density": 608.7,
+            "roughness": "Rough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.25,
+            "visible_absorptance": 0.65
+        },
+        "LW Concrete - 30cm": {
+            "conductivity": 0.57,
+            "density": 608.7,
+            "roughness": "Rough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.3,
+            "visible_absorptance": 0.65
+        },
+        "LW Concrete - 40cm": {
+            "conductivity": 0.57,
+            "density": 608.7,
+            "roughness": "Rough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.4,
+            "visible_absorptance": 0.65
+        },
+        "LW Concrete - 50cm": {
+            "conductivity": 0.57,
+            "density": 608.7,
+            "roughness": "Rough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 830.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.5,
+            "visible_absorptance": 0.65
+        },
+        "Wood - 1cm": {
+            "conductivity": 0.11,
+            "density": 544.62,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.78,
+            "specific_heat": 1420.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.01,
+            "visible_absorptance": 0.78
+        },
+        "Wood - 2cm": {
+            "conductivity": 0.11,
+            "density": 544.62,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.78,
+            "specific_heat": 1420.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.02,
+            "visible_absorptance": 0.78
+        },
+        "Wood - 3cm": {
+            "conductivity": 0.11,
+            "density": 544.62,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.78,
+            "specific_heat": 1420.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.03,
+            "visible_absorptance": 0.78
+        },
+        "Wood - 5cm": {
+            "conductivity": 0.11,
+            "density": 544.62,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.78,
+            "specific_heat": 1420.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.05,
+            "visible_absorptance": 0.78
+        },
+        "Wood - 10cm": {
+            "conductivity": 0.11,
+            "density": 544.62,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.78,
+            "specific_heat": 1420.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.1,
+            "visible_absorptance": 0.78
+        }
+    },
+    "Material:AirGap": {
+        "Air - 1cm": {
+            "thermal_resistance": 0.34
+        },
+        "Air - 2cm": {
+            "thermal_resistance": 0.68
+        },
+        "Air - 3cm": {
+            "thermal_resistance": 1.02
+        },
+        "Air - 5cm": {
+            "thermal_resistance": 1.7
+        },
+        "Air - 10cm": {
+            "thermal_resistance": 3.4
+        }
+    },
+    "Output:Meter:MeterFileOnly": {
+        "Output:Meter:MeterFileOnly 1": {
+            "key_name": "Electricity:Facility",
+            "reporting_frequency": "Monthly"
+        },
+        "Output:Meter:MeterFileOnly 2": {
+            "key_name": "Electricity:Building",
+            "reporting_frequency": "Monthly"
+        },
+        "Output:Meter:MeterFileOnly 3": {
+            "key_name": "InteriorLights:Electricity",
+            "reporting_frequency": "Monthly"
+        },
+        "Output:Meter:MeterFileOnly 4": {
+            "key_name": "Electricity:Facility",
+            "reporting_frequency": "RunPeriod"
+        },
+        "Output:Meter:MeterFileOnly 5": {
+            "key_name": "Electricity:Building",
+            "reporting_frequency": "RunPeriod"
+        },
+        "Output:Meter:MeterFileOnly 6": {
+            "key_name": "InteriorLights:Electricity",
+            "reporting_frequency": "RunPeriod"
+        }
+    },
+    "Output:Table:SummaryReports": {
+        "Output:Table:SummaryReports 1": {
+            "reports": [
+                {
+                    "report_name": "AllSummary"
+                }
+            ]
+        }
+    },
+    "Output:Variable": {
+        "Output:Variable 1": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Site Outdoor Air Drybulb Temperature"
+        },
+        "Output:Variable 2": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Zone Mean Air Temperature"
+        },
+        "Output:Variable 3": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Room Air Zone Jet Region Temperature"
+        },
+        "Output:Variable 4": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Room Air Zone Recirculation Region Temperature"
+        },
+        "Output:Variable 5": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Room Air Zone Jet Region Average Air Velocity"
+        },
+        "Output:Variable 6": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Room Air Zone Recirculation Region Average Air Velocity"
+        },
+        "Output:Variable 7": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Room Air Zone Inflow Opening Area"
+        },
+        "Output:Variable 8": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Room Air Zone Room Length"
+        },
+        "Output:Variable 9": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Room Air Zone Recirculation and Inflow Rate Ratio"
+        },
+        "Output:Variable 10": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Room Air Zone Is Mixing Status"
+        },
+        "Output:Variable 11": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "AFN Linkage Node 2 to Node 1 Volume Flow Rate"
+        },
+        "Output:Variable 12": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "AFN Linkage Node 1 to Node 2 Volume Flow Rate"
+        },
+        "Output:Variable 13": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Site Wind Speed"
+        },
+        "Output:Variable 14": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Site Wind Direction"
+        },
+        "Output:Variable 15": {
+            "key_value": "*",
+            "reporting_frequency": "Timestep",
+            "variable_name": "Zone Mean Radiant Temperature"
+        },
+        "Output:Variable 16": {
+            "key_value": "*",
+            "variable_name": "Room Air Zone Is Recirculating Status"
+        }
+    },
+    "Output:VariableDictionary": {
+        "Output:VariableDictionary 1": {
+            "key_field": "regular"
+        }
+    },
+    "OutputControl:Table:Style": {
+        "OutputControl:Table:Style 1": {
+            "column_separator": "HTML"
+        }
+    },
+    "RoomAirModelType": {
+        "cv": {
+            "air_temperature_coupling_strategy": "Direct",
+            "room_air_modeling_type": "CrossVentilation",
+            "zone_name": "zona"
+        }
+    },
+    "RoomAirSettings:CrossVentilation": {
+        "RoomAirSettings:CrossVentilation 1": {
+            "airflow_region_used_for_thermal_comfort_evaluation": "Jet",
+            "gain_distribution_schedule_name": "GANHOS",
+            "zone_name": "ZONA"
+        }
+    },
+    "RunPeriod": {
+        "Run Period 1": {
+            "begin_day_of_month": 15,
+            "begin_month": 8,
+            "end_day_of_month": 17,
+            "end_month": 8
+        },
+        "Run Period 2": {
+            "begin_day_of_month": 15,
+            "begin_month": 1,
+            "end_day_of_month": 17,
+            "end_month": 1
+        }
+    },
+    "Schedule:Compact": {
+        "GANHOS": {
+            "data": [
+                {
+                    "field": "Through: 12/31"
+                },
+                {
+                    "field": "For: AllDays"
+                },
+                {
+                    "field": "Until: 24:00"
+                },
+                {
+                    "field": 0.2
+                }
+            ],
+            "schedule_type_limits_name": "Fraction"
+        },
+        "ON": {
+            "data": [
+                {
+                    "field": "Through: 12/31"
+                },
+                {
+                    "field": "For: AllDays"
+                },
+                {
+                    "field": "Until: 24:00"
+                },
+                {
+                    "field": 1
+                }
+            ],
+            "schedule_type_limits_name": "Fraction"
+        }
+    },
+    "ScheduleTypeLimits": {
+        "Fraction": {
+            "lower_limit_value": 0.0,
+            "numeric_type": "Continuous",
+            "upper_limit_value": 1.0
+        },
+        "Real": {
+            "numeric_type": "Continuous"
+        }
+    },
+    "ShadowCalculation": {
+        "ShadowCalculation 1": {
+            "shading_calculation_method": "PolygonClipping",
+            "shading_calculation_update_frequency": 20,
+            "shading_calculation_update_frequency_method": "Periodic"
+        }
+    },
+    "SimulationControl": {
+        "SimulationControl 1": {
+            "do_hvac_sizing_simulation_for_sizing_periods": "No",
+            "do_plant_sizing_calculation": "No",
+            "do_system_sizing_calculation": "No",
+            "do_zone_sizing_calculation": "No",
+            "maximum_number_of_hvac_sizing_simulation_passes": 1,
+            "run_simulation_for_sizing_periods": "No",
+            "run_simulation_for_weather_file_run_periods": "Yes"
+        }
+    },
+    "Site:GroundTemperature:BuildingSurface": {
+        "Site:GroundTemperature:BuildingSurface 1": {
+            "april_ground_temperature": 20,
+            "august_ground_temperature": 20,
+            "december_ground_temperature": 20,
+            "february_ground_temperature": 20,
+            "january_ground_temperature": 20,
+            "july_ground_temperature": 20,
+            "june_ground_temperature": 20,
+            "march_ground_temperature": 20,
+            "may_ground_temperature": 20,
+            "november_ground_temperature": 20,
+            "october_ground_temperature": 20,
+            "september_ground_temperature": 20
+        }
+    },
+    "Site:Location": {
+        "SAN_FRANCISCO_CA_USA_WMO_724940": {
+            "elevation": 5.0,
+            "latitude": 37.62,
+            "longitude": -122.37,
+            "time_zone": -8.0
+        }
+    },
+    "SizingPeriod:DesignDay": {
+        "SAN_FRANCISCO Ann Clg 1% Condns DB=>MWB": {
+            "barometric_pressure": 101265.0,
+            "daily_dry_bulb_temperature_range": 9,
+            "day_of_month": 21,
+            "day_type": "SummerDesignDay",
+            "daylight_saving_time_indicator": "No",
+            "humidity_condition_type": "WetBulb",
+            "maximum_dry_bulb_temperature": 25.6,
+            "month": 9,
+            "rain_indicator": "No",
+            "sky_clearness": 1.0,
+            "snow_indicator": "No",
+            "solar_model_indicator": "ASHRAEClearSky",
+            "wetbulb_or_dewpoint_at_maximum_dry_bulb": 16.6,
+            "wind_direction": 310,
+            "wind_speed": 5.8
+        },
+        "SAN_FRANCISCO Ann Htg 99% Condns DB": {
+            "barometric_pressure": 101265.0,
+            "daily_dry_bulb_temperature_range": 0.0,
+            "day_of_month": 21,
+            "day_type": "WinterDesignDay",
+            "daylight_saving_time_indicator": "No",
+            "humidity_condition_type": "WetBulb",
+            "maximum_dry_bulb_temperature": 4.4,
+            "month": 1,
+            "rain_indicator": "No",
+            "sky_clearness": 0.0,
+            "snow_indicator": "No",
+            "solar_model_indicator": "ASHRAEClearSky",
+            "wetbulb_or_dewpoint_at_maximum_dry_bulb": 4.4,
+            "wind_direction": 140,
+            "wind_speed": 2.4
+        }
+    },
+    "SurfaceConvectionAlgorithm:Inside": {
+        "SurfaceConvectionAlgorithm:Inside 1": {
+            "algorithm": "TARP"
+        }
+    },
+    "SurfaceConvectionAlgorithm:Outside": {
+        "SurfaceConvectionAlgorithm:Outside 1": {
+            "algorithm": "DOE-2"
+        }
+    },
+    "Timestep": {
+        "Timestep 1": {
+            "number_of_timesteps_per_hour": 4
+        }
+    },
+    "Version": {
+        "Version 1": {
+            "version_identifier": "23.2"
+        }
+    },
+    "WindowMaterial:Gas": {
+        "WindowGas:Air - 1.5cm": {
+            "gas_type": "Air",
+            "thickness": 0.015
+        },
+        "WindowGas:Air - 1cm": {
+            "gas_type": "Air",
+            "thickness": 0.01
+        },
+        "WindowGas:Air - 2cm": {
+            "gas_type": "Air",
+            "thickness": 0.02
+        }
+    },
+    "WindowMaterial:Glazing": {
+        "Glass:Simple - 6mm": {
+            "back_side_infrared_hemispherical_emissivity": 0.84,
+            "back_side_solar_reflectance_at_normal_incidence": 0.071,
+            "back_side_visible_reflectance_at_normal_incidence": 0.08,
+            "conductivity": 0.9,
+            "front_side_infrared_hemispherical_emissivity": 0.84,
+            "front_side_solar_reflectance_at_normal_incidence": 0.071,
+            "front_side_visible_reflectance_at_normal_incidence": 0.08,
+            "infrared_transmittance_at_normal_incidence": 0.0,
+            "optical_data_type": "SpectralAverage",
+            "solar_transmittance_at_normal_incidence": 0.775,
+            "thickness": 0.006,
+            "visible_transmittance_at_normal_incidence": 0.881
+        },
+        "Glass:Simple - 8mm": {
+            "back_side_infrared_hemispherical_emissivity": 0.84,
+            "back_side_solar_reflectance_at_normal_incidence": 0.071,
+            "back_side_visible_reflectance_at_normal_incidence": 0.08,
+            "conductivity": 0.9,
+            "front_side_infrared_hemispherical_emissivity": 0.84,
+            "front_side_solar_reflectance_at_normal_incidence": 0.071,
+            "front_side_visible_reflectance_at_normal_incidence": 0.08,
+            "infrared_transmittance_at_normal_incidence": 0.0,
+            "optical_data_type": "SpectralAverage",
+            "solar_transmittance_at_normal_incidence": 0.775,
+            "thickness": 0.008,
+            "visible_transmittance_at_normal_incidence": 0.881
+        },
+        "Glass:Simple - 10mm": {
+            "back_side_infrared_hemispherical_emissivity": 0.84,
+            "back_side_solar_reflectance_at_normal_incidence": 0.071,
+            "back_side_visible_reflectance_at_normal_incidence": 0.08,
+            "conductivity": 0.9,
+            "front_side_infrared_hemispherical_emissivity": 0.84,
+            "front_side_solar_reflectance_at_normal_incidence": 0.071,
+            "front_side_visible_reflectance_at_normal_incidence": 0.08,
+            "infrared_transmittance_at_normal_incidence": 0.0,
+            "optical_data_type": "SpectralAverage",
+            "solar_transmittance_at_normal_incidence": 0.775,
+            "thickness": 0.01,
+            "visible_transmittance_at_normal_incidence": 0.881
+        },
+        "Glass:Simple - 15mm": {
+            "back_side_infrared_hemispherical_emissivity": 0.84,
+            "back_side_solar_reflectance_at_normal_incidence": 0.071,
+            "back_side_visible_reflectance_at_normal_incidence": 0.08,
+            "conductivity": 0.9,
+            "front_side_infrared_hemispherical_emissivity": 0.84,
+            "front_side_solar_reflectance_at_normal_incidence": 0.071,
+            "front_side_visible_reflectance_at_normal_incidence": 0.08,
+            "infrared_transmittance_at_normal_incidence": 0.0,
+            "optical_data_type": "SpectralAverage",
+            "solar_transmittance_at_normal_incidence": 0.775,
+            "thickness": 0.015,
+            "visible_transmittance_at_normal_incidence": 0.881
+        },
+        "Glass:Simple - 20mm": {
+            "back_side_infrared_hemispherical_emissivity": 0.84,
+            "back_side_solar_reflectance_at_normal_incidence": 0.071,
+            "back_side_visible_reflectance_at_normal_incidence": 0.08,
+            "conductivity": 0.9,
+            "front_side_infrared_hemispherical_emissivity": 0.84,
+            "front_side_solar_reflectance_at_normal_incidence": 0.071,
+            "front_side_visible_reflectance_at_normal_incidence": 0.08,
+            "infrared_transmittance_at_normal_incidence": 0.0,
+            "optical_data_type": "SpectralAverage",
+            "solar_transmittance_at_normal_incidence": 0.775,
+            "thickness": 0.02,
+            "visible_transmittance_at_normal_incidence": 0.881
+        }
+    },
+    "Zone": {
+        "ZONA": {
+            "direction_of_relative_north": 0,
+            "multiplier": 1,
+            "type": 1,
+            "x_origin": 0,
+            "y_origin": 0,
+            "z_origin": 0
+        }
+    }
+}

@@ -1,0 +1,1598 @@
+{
+    "AirLoopHVAC": {
+        "Typical Residential System": {
+            "availability_manager_list_name": "Reheat System 1 Avail List",
+            "branch_list_name": "Air Loop Branches",
+            "demand_side_inlet_node_names": "Zone Equipment Inlet Node",
+            "demand_side_outlet_node_name": "Return Air Mixer Outlet",
+            "design_supply_air_flow_rate": 0.037,
+            "supply_side_inlet_node_name": "Air Loop Inlet Node",
+            "supply_side_outlet_node_names": "Air Loop Outlet Node"
+        }
+    },
+    "AirLoopHVAC:ReturnPath": {
+        "TermReheatReturnPath": {
+            "components": [
+                {
+                    "component_name": "Zone Return Air Mixer",
+                    "component_object_type": "AirLoopHVAC:ZoneMixer"
+                }
+            ],
+            "return_air_path_outlet_node_name": "Return Air Mixer Outlet"
+        }
+    },
+    "AirLoopHVAC:SupplyPath": {
+        "TermReheatSupplyPath": {
+            "components": [
+                {
+                    "component_name": "Zone Supply Air Splitter",
+                    "component_object_type": "AirLoopHVAC:ZoneSplitter"
+                }
+            ],
+            "supply_air_path_inlet_node_name": "Zone Equipment Inlet Node"
+        }
+    },
+    "AirLoopHVAC:ZoneMixer": {
+        "Zone Return Air Mixer": {
+            "nodes": [
+                {
+                    "inlet_node_name": "Zone Outlet Node"
+                }
+            ],
+            "outlet_node_name": "Return Air Mixer Outlet"
+        }
+    },
+    "AirLoopHVAC:ZoneSplitter": {
+        "Zone Supply Air Splitter": {
+            "inlet_node_name": "Zone Equipment Inlet Node",
+            "nodes": [
+                {
+                    "outlet_node_name": "Zone Inlet Node ATInlet"
+                }
+            ]
+        }
+    },
+    "AirTerminal:SingleDuct:ConstantVolume:NoReheat": {
+        "ZoneDirectAir": {
+            "air_inlet_node_name": "Zone Inlet Node ATInlet",
+            "air_outlet_node_name": "Zone Inlet Node",
+            "availability_schedule_name": "HVACAvailSched",
+            "maximum_air_flow_rate": 0.037
+        }
+    },
+    "AirflowNetwork:Distribution:Component:Coil": {
+        "AirflowNetwork:Distribution:Component:Coil 1": {
+            "air_path_hydraulic_diameter": 0.375,
+            "air_path_length": 0.1,
+            "coil_name": "ACDXCoil 1",
+            "coil_object_type": "Coil:Cooling:DX:SingleSpeed"
+        },
+        "AirflowNetwork:Distribution:Component:Coil 2": {
+            "air_path_hydraulic_diameter": 0.375,
+            "air_path_length": 0.1,
+            "coil_name": "Main Heating Coil 1",
+            "coil_object_type": "Coil:Heating:Fuel"
+        }
+    },
+    "AirflowNetwork:Distribution:Component:Duct": {
+        "AirLoopReturn": {
+            "coefficient_for_local_dynamic_loss_due_to_fitting": 0.0,
+            "cross_section_area": 0.1104,
+            "duct_length": 0.1,
+            "heat_transmittance_coefficient_u_factor_for_duct_wall_construction": 2.5,
+            "hydraulic_diameter": 0.375,
+            "overall_moisture_transmittance_coefficient_from_air_to_air": 1e-07,
+            "surface_roughness": 0.0001
+        },
+        "AirLoopSupply": {
+            "coefficient_for_local_dynamic_loss_due_to_fitting": 0.0,
+            "cross_section_area": 0.1104,
+            "duct_length": 0.1,
+            "heat_transmittance_coefficient_u_factor_for_duct_wall_construction": 2.5,
+            "hydraulic_diameter": 0.375,
+            "overall_moisture_transmittance_coefficient_from_air_to_air": 1e-07,
+            "surface_roughness": 0.0001
+        },
+        "MainReturn": {
+            "coefficient_for_local_dynamic_loss_due_to_fitting": 0,
+            "cross_section_area": 0.0276,
+            "duct_length": 1,
+            "heat_transmittance_coefficient_u_factor_for_duct_wall_construction": 2.5,
+            "hydraulic_diameter": 0.1875,
+            "overall_moisture_transmittance_coefficient_from_air_to_air": 1e-07,
+            "surface_roughness": 0.0009
+        },
+        "MainTruck": {
+            "coefficient_for_local_dynamic_loss_due_to_fitting": 0,
+            "cross_section_area": 0.0182,
+            "duct_length": 4.318,
+            "heat_transmittance_coefficient_u_factor_for_duct_wall_construction": 57446.8,
+            "hydraulic_diameter": 0.1524,
+            "overall_moisture_transmittance_coefficient_from_air_to_air": 1e-07,
+            "surface_roughness": 0.0009
+        },
+        "ZoneConnectionDuct": {
+            "coefficient_for_local_dynamic_loss_due_to_fitting": 0.0,
+            "cross_section_area": 0.1104,
+            "duct_length": 0.1,
+            "heat_transmittance_coefficient_u_factor_for_duct_wall_construction": 2.5,
+            "hydraulic_diameter": 0.375,
+            "overall_moisture_transmittance_coefficient_from_air_to_air": 1e-07,
+            "surface_roughness": 0.0001
+        },
+        "ZoneReturn": {
+            "coefficient_for_local_dynamic_loss_due_to_fitting": 0,
+            "cross_section_area": 0.0276,
+            "duct_length": 3,
+            "heat_transmittance_coefficient_u_factor_for_duct_wall_construction": 2.5,
+            "hydraulic_diameter": 0.1875,
+            "overall_moisture_transmittance_coefficient_from_air_to_air": 1e-07,
+            "surface_roughness": 0.0009
+        },
+        "ZoneSupply": {
+            "coefficient_for_local_dynamic_loss_due_to_fitting": 0,
+            "cross_section_area": 0.0182,
+            "duct_length": 3,
+            "heat_transmittance_coefficient_u_factor_for_duct_wall_construction": 2.5,
+            "hydraulic_diameter": 0.1524,
+            "overall_moisture_transmittance_coefficient_from_air_to_air": 1e-07,
+            "surface_roughness": 0.0009
+        },
+        "ZoneSupply1Link2 ATInlet Duct": {
+            "coefficient_for_local_dynamic_loss_due_to_fitting": 0.0,
+            "cross_section_area": 0.0182,
+            "duct_length": 0.0001,
+            "heat_transmittance_coefficient_u_factor_for_duct_wall_construction": 1e-07,
+            "hydraulic_diameter": 0.1524,
+            "overall_moisture_transmittance_coefficient_from_air_to_air": 1e-07,
+            "surface_roughness": 0.0009
+        }
+    },
+    "AirflowNetwork:Distribution:Component:Fan": {
+        "AirflowNetwork:Distribution:Component:Fan 1": {
+            "fan_name": "Supply Fan 1",
+            "supply_fan_object_type": "Fan:ConstantVolume"
+        }
+    },
+    "AirflowNetwork:Distribution:DuctViewFactors": {
+        "AirflowNetwork:Distribution:DuctViewFactors 1": {
+            "duct_surface_emittance": 0.9,
+            "duct_surface_exposure_fraction": 1.0,
+            "linkage_name": "Main Link",
+            "surfaces": [
+                {
+                    "surface_name": "Attic Ceiling",
+                    "surface_view_factor": 0.704
+                },
+                {
+                    "surface_name": "Roof East",
+                    "surface_view_factor": 0.118
+                },
+                {
+                    "surface_name": "Roof West",
+                    "surface_view_factor": 0.118
+                },
+                {
+                    "surface_name": "Gable South",
+                    "surface_view_factor": 0.03
+                },
+                {
+                    "surface_name": "Gable North",
+                    "surface_view_factor": 0.03
+                }
+            ]
+        }
+    },
+    "AirflowNetwork:Distribution:Linkage": {
+        "CoolingCoilLink": {
+            "component_name": "ACDXCoil 1",
+            "node_1_name": "FanOutletNode",
+            "node_2_name": "HeatingInletNode"
+        },
+        "EquipmentAirLoopLink": {
+            "component_name": "AirLoopSupply",
+            "node_1_name": "HeatingOutletNode",
+            "node_2_name": "EquipmentInletNode"
+        },
+        "HeatingCoilLink": {
+            "component_name": "Main Heating Coil 1",
+            "node_1_name": "HeatingInletNode",
+            "node_2_name": "HeatingOutletNode"
+        },
+        "Main Link": {
+            "component_name": "MainTruck",
+            "node_1_name": "EquipmentInletNode",
+            "node_2_name": "SplitterNode",
+            "thermal_zone_name": "Attic Thermal Zone"
+        },
+        "ReturnMixerLink": {
+            "component_name": "MainReturn",
+            "node_1_name": "MixerNode",
+            "node_2_name": "MainReturnNode",
+            "thermal_zone_name": "Occupied Thermal Zone"
+        },
+        "SupplyFanLink": {
+            "component_name": "Supply Fan 1",
+            "node_1_name": "FanInletNode",
+            "node_2_name": "FanOutletNode"
+        },
+        "SystemInletLink": {
+            "component_name": "MainReturn",
+            "node_1_name": "MainInletNode",
+            "node_2_name": "FanInletNode",
+            "thermal_zone_name": "Occupied Thermal Zone"
+        },
+        "SystemReturnLink": {
+            "component_name": "AirLoopReturn",
+            "node_1_name": "MainReturnNode",
+            "node_2_name": "MainInletNode"
+        },
+        "ZoneReturn1Link": {
+            "component_name": "ZoneReturn",
+            "node_1_name": "ZoneOutletNode",
+            "node_2_name": "ZoneReturnNode",
+            "thermal_zone_name": "Occupied Thermal Zone"
+        },
+        "ZoneReturn2Link": {
+            "component_name": "ZoneReturn",
+            "node_1_name": "ZoneReturnNode",
+            "node_2_name": "MixerNode",
+            "thermal_zone_name": "Occupied Thermal Zone"
+        },
+        "ZoneReturnConnectionLink": {
+            "component_name": "ZoneConnectionDuct",
+            "node_1_name": "Occupied Thermal Zone",
+            "node_2_name": "ZoneOutletNode"
+        },
+        "ZoneSupply1Link2": {
+            "component_name": "ZoneSupply",
+            "node_1_name": "ZoneSupplyNode",
+            "node_2_name": "ZoneSupplyRegisterNode ATInlet",
+            "thermal_zone_name": "Occupied Thermal Zone"
+        },
+        "ZoneSupply1Link2 ATInlet": {
+            "component_name": "ZoneSupply1Link2 ATInlet Duct",
+            "node_1_name": "ZoneSupplyRegisterNode ATInlet",
+            "node_2_name": "ZoneSupplyRegisterNode",
+            "thermal_zone_name": "Occupied Thermal Zone"
+        },
+        "ZoneSupplyConnectionLink": {
+            "component_name": "ZoneConnectionDuct",
+            "node_1_name": "ZoneSupplyRegisterNode",
+            "node_2_name": "Occupied Thermal Zone"
+        },
+        "ZoneSupplyLink1": {
+            "component_name": "ZoneSupply",
+            "node_1_name": "SplitterNode",
+            "node_2_name": "ZoneSupplyNode",
+            "thermal_zone_name": "Occupied Thermal Zone"
+        }
+    },
+    "AirflowNetwork:Distribution:Node": {
+        "EquipmentInletNode": {
+            "component_name_or_node_name": "Zone Equipment Inlet Node",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "FanInletNode": {
+            "component_name_or_node_name": "Air Loop Inlet Node",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "FanOutletNode": {
+            "component_name_or_node_name": "Cooling Coil Air Inlet Node",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "HeatingInletNode": {
+            "component_name_or_node_name": "Heating Coil Air Inlet Node",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "HeatingOutletNode": {
+            "component_name_or_node_name": "Air Loop Outlet Node",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "MainInletNode": {
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "MainReturnNode": {
+            "component_name_or_node_name": "Return Air Mixer Outlet",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "MixerNode": {
+            "component_object_type_or_node_type": "AirLoopHVAC:ZoneMixer",
+            "node_height": 1
+        },
+        "SplitterNode": {
+            "component_object_type_or_node_type": "AirLoopHVAC:ZoneSplitter",
+            "node_height": 1
+        },
+        "ZoneOutletNode": {
+            "component_name_or_node_name": "Zone Outlet Node",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "ZoneReturnNode": {
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "ZoneSupplyNode": {
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "ZoneSupplyRegisterNode": {
+            "component_name_or_node_name": "Zone Inlet Node",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        },
+        "ZoneSupplyRegisterNode ATInlet": {
+            "component_name_or_node_name": "Zone Inlet Node ATInlet",
+            "component_object_type_or_node_type": "Other",
+            "node_height": 1
+        }
+    },
+    "AirflowNetwork:MultiZone:ReferenceCrackConditions": {
+        "ReferenceCrackConditions": {
+            "reference_barometric_pressure": 101325,
+            "reference_humidity_ratio": 0.0,
+            "reference_temperature": 20.0
+        }
+    },
+    "AirflowNetwork:MultiZone:Surface": {
+        "AirflowNetwork:MultiZone:Surface 1": {
+            "leakage_component_name": "ZoneLeak",
+            "surface_name": "Wall South",
+            "window_door_opening_factor_or_crack_factor": 1e-05
+        },
+        "AirflowNetwork:MultiZone:Surface 2": {
+            "leakage_component_name": "ZoneLeak",
+            "surface_name": "Wall East",
+            "window_door_opening_factor_or_crack_factor": 1e-05
+        },
+        "AirflowNetwork:MultiZone:Surface 3": {
+            "leakage_component_name": "ZoneLeak",
+            "surface_name": "Gable North 2",
+            "window_door_opening_factor_or_crack_factor": 1e-05
+        },
+        "AirflowNetwork:MultiZone:Surface 4": {
+            "leakage_component_name": "ZoneLeak",
+            "surface_name": "Gable South 2",
+            "window_door_opening_factor_or_crack_factor": 1e-05
+        }
+    },
+    "AirflowNetwork:MultiZone:Surface:Crack": {
+        "ZoneLeak": {
+            "air_mass_flow_coefficient_at_reference_conditions": 1e-05,
+            "air_mass_flow_exponent": 0.5,
+            "reference_crack_conditions": "ReferenceCrackConditions"
+        }
+    },
+    "AirflowNetwork:MultiZone:Zone": {
+        "AirflowNetwork:MultiZone:Zone 1": {
+            "indoor_and_outdoor_enthalpy_difference_lower_limit_for_maximum_venting_open_factor": 0.0,
+            "indoor_and_outdoor_enthalpy_difference_upper_limit_for_minimum_venting_open_factor": 300000.0,
+            "indoor_and_outdoor_temperature_difference_lower_limit_for_maximum_venting_open_factor": 0.0,
+            "indoor_and_outdoor_temperature_difference_upper_limit_for_minimum_venting_open_factor": 100.0,
+            "minimum_venting_open_factor": 1e-05,
+            "ventilation_control_mode": "NoVent",
+            "zone_name": "Attic Thermal Zone"
+        },
+        "AirflowNetwork:MultiZone:Zone 2": {
+            "indoor_and_outdoor_enthalpy_difference_lower_limit_for_maximum_venting_open_factor": 0.0,
+            "indoor_and_outdoor_enthalpy_difference_upper_limit_for_minimum_venting_open_factor": 300000.0,
+            "indoor_and_outdoor_temperature_difference_lower_limit_for_maximum_venting_open_factor": 0.0,
+            "indoor_and_outdoor_temperature_difference_upper_limit_for_minimum_venting_open_factor": 100.0,
+            "minimum_venting_open_factor": 1e-05,
+            "ventilation_control_mode": "NoVent",
+            "zone_name": "Occupied Thermal Zone"
+        }
+    },
+    "AirflowNetwork:SimulationControl": {
+        "House AirflowNetwork": {
+            "absolute_airflow_convergence_tolerance": 1e-06,
+            "airflownetwork_control": "MultizoneWithDistribution",
+            "azimuth_angle_of_long_axis_of_building": 0.0,
+            "building_type": "LowRise",
+            "convergence_acceleration_limit": -0.5,
+            "initialization_type": "ZeroNodePressures",
+            "maximum_number_of_iterations": 500,
+            "ratio_of_building_width_along_short_axis_to_width_along_long_axis": 1.0,
+            "relative_airflow_convergence_tolerance": 0.0001,
+            "wind_pressure_coefficient_type": "SurfaceAverageCalculation"
+        }
+    },
+    "AvailabilityManager:Scheduled": {
+        "Reheat System 1 Avail": {
+            "schedule_name": "HVACAvailSched"
+        }
+    },
+    "AvailabilityManagerAssignmentList": {
+        "Reheat System 1 Avail List": {
+            "managers": [
+                {
+                    "availability_manager_name": "Reheat System 1 Avail",
+                    "availability_manager_object_type": "AvailabilityManager:Scheduled"
+                }
+            ]
+        }
+    },
+    "Branch": {
+        "Air Loop Main Branch": {
+            "components": [
+                {
+                    "component_inlet_node_name": "Air Loop Inlet Node",
+                    "component_name": "Supply Fan 1",
+                    "component_object_type": "Fan:ConstantVolume",
+                    "component_outlet_node_name": "Cooling Coil Air Inlet Node"
+                },
+                {
+                    "component_inlet_node_name": "Cooling Coil Air Inlet Node",
+                    "component_name": "DX Cooling Coil System 1",
+                    "component_object_type": "CoilSystem:Cooling:DX",
+                    "component_outlet_node_name": "Heating Coil Air Inlet Node"
+                },
+                {
+                    "component_inlet_node_name": "Heating Coil Air Inlet Node",
+                    "component_name": "Main Heating Coil 1",
+                    "component_object_type": "Coil:Heating:Fuel",
+                    "component_outlet_node_name": "Air Loop Outlet Node"
+                }
+            ]
+        }
+    },
+    "BranchList": {
+        "Air Loop Branches": {
+            "branches": [
+                {
+                    "branch_name": "Air Loop Main Branch"
+                }
+            ]
+        }
+    },
+    "Building": {
+        "House with AirflowNetwork simulation": {
+            "loads_convergence_tolerance_value": 0.001,
+            "maximum_number_of_warmup_days": 25,
+            "minimum_number_of_warmup_days": 6,
+            "north_axis": 0,
+            "solar_distribution": "FullInteriorAndExterior",
+            "temperature_convergence_tolerance_value": 0.005,
+            "terrain": "Suburbs"
+        }
+    },
+    "BuildingSurface:Detailed": {
+        "Attic Ceiling": {
+            "construction_name": "Ceiling FATM",
+            "outside_boundary_condition": "Surface",
+            "outside_boundary_condition_object": "Zone Ceiling",
+            "sun_exposure": "NoSun",
+            "surface_type": "Floor",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "wind_exposure": "NoWind",
+            "zone_name": "Attic Thermal Zone"
+        },
+        "Floor": {
+            "construction_name": "FLOOR:LIVING",
+            "outside_boundary_condition": "Ground",
+            "sun_exposure": "NoSun",
+            "surface_type": "Floor",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "wind_exposure": "NoWind",
+            "zone_name": "Occupied Thermal Zone"
+        },
+        "Gable North": {
+            "construction_name": "Gable FATM",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "NoSun",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 2.49,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.0541
+                },
+                {
+                    "vertex_x_coordinate": 4.48,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0.211666666666666
+                },
+                {
+                    "vertex_x_coordinate": 4.48,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "wind_exposure": "NoWind",
+            "zone_name": "Attic Thermal Zone"
+        },
+        "Gable North 2": {
+            "construction_name": "Gable FATM",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 4.48,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0.211666666666666
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.48,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Attic Thermal Zone"
+        },
+        "Gable South": {
+            "construction_name": "Gable FATM",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 2.49,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.0541
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.48,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.48,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0.211666666666666
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Attic Thermal Zone"
+        },
+        "Gable South 2": {
+            "construction_name": "Gable FATM",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 4.48,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0.211666666666666
+                },
+                {
+                    "vertex_x_coordinate": 4.48,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Attic Thermal Zone"
+        },
+        "Roof East": {
+            "construction_name": "Roof FATM",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Roof",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 2.49,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.0541
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 2.49,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.0541
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Attic Thermal Zone"
+        },
+        "Roof West": {
+            "construction_name": "Roof FATM",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Roof",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 2.49,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.0541
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 2.49,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.0541
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Attic Thermal Zone"
+        },
+        "Wall East": {
+            "construction_name": "EXTWALL:LIVING",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.6
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.6
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Occupied Thermal Zone"
+        },
+        "Wall North": {
+            "construction_name": "EXTWALL:LIVING",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.6
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.6
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Occupied Thermal Zone"
+        },
+        "Wall South": {
+            "construction_name": "EXTWALL:LIVING",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.6
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.6
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Occupied Thermal Zone"
+        },
+        "Wall West": {
+            "construction_name": "EXTWALL:LIVING",
+            "outside_boundary_condition": "Outdoors",
+            "sun_exposure": "SunExposed",
+            "surface_type": "Wall",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.6
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 0
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.6
+                }
+            ],
+            "wind_exposure": "WindExposed",
+            "zone_name": "Occupied Thermal Zone"
+        },
+        "Zone Ceiling": {
+            "construction_name": "Ceiling FATM",
+            "outside_boundary_condition": "Surface",
+            "outside_boundary_condition_object": "Attic Ceiling",
+            "sun_exposure": "NoSun",
+            "surface_type": "Ceiling",
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.6
+                },
+                {
+                    "vertex_x_coordinate": 4.98,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.6
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 4.32,
+                    "vertex_z_coordinate": 1.6
+                },
+                {
+                    "vertex_x_coordinate": 0,
+                    "vertex_y_coordinate": 0,
+                    "vertex_z_coordinate": 1.6
+                }
+            ],
+            "wind_exposure": "NoWind",
+            "zone_name": "Occupied Thermal Zone"
+        }
+    },
+    "Coil:Cooling:DX:SingleSpeed": {
+        "ACDXCoil 1": {
+            "2023_rated_evaporator_fan_power_per_volume_flow_rate": 934.4,
+            "air_inlet_node_name": "Cooling Coil Air Inlet Node",
+            "air_outlet_node_name": "Heating Coil Air Inlet Node",
+            "availability_schedule_name": "HVACAvailSched",
+            "energy_input_ratio_function_of_flow_fraction_curve_name": "WindACEIRFFF",
+            "energy_input_ratio_function_of_temperature_curve_name": "WindACEIRFT",
+            "gross_rated_cooling_cop": 3.0,
+            "gross_rated_sensible_heat_ratio": 0.8,
+            "gross_rated_total_cooling_capacity": 650,
+            "part_load_fraction_correlation_curve_name": "WindACPLFFPLR",
+            "rated_air_flow_rate": 0.037,
+            "total_cooling_capacity_function_of_flow_fraction_curve_name": "WindACCoolCapFFF",
+            "total_cooling_capacity_function_of_temperature_curve_name": "WindACCoolCapFT"
+        }
+    },
+    "Coil:Heating:Fuel": {
+        "Main Heating Coil 1": {
+            "air_inlet_node_name": "Heating Coil Air Inlet Node",
+            "air_outlet_node_name": "Air Loop Outlet Node",
+            "availability_schedule_name": "HVACAvailSched",
+            "burner_efficiency": 0.8,
+            "fuel_type": "NaturalGas",
+            "nominal_capacity": 3050,
+            "temperature_setpoint_node_name": "Air Loop Outlet Node"
+        }
+    },
+    "CoilSystem:Cooling:DX": {
+        "DX Cooling Coil System 1": {
+            "availability_schedule_name": "HVACAvailSched",
+            "cooling_coil_name": "ACDXCoil 1",
+            "cooling_coil_object_type": "Coil:Cooling:DX:SingleSpeed",
+            "dx_cooling_coil_system_inlet_node_name": "Cooling Coil Air Inlet Node",
+            "dx_cooling_coil_system_outlet_node_name": "Heating Coil Air Inlet Node",
+            "dx_cooling_coil_system_sensor_node_name": "Heating Coil Air Inlet Node"
+        }
+    },
+    "Construction": {
+        "Ceiling FATM": {
+            "outside_layer": "Insulation FATM"
+        },
+        "EXTWALL:LIVING": {
+            "layer_2": "CB11",
+            "layer_3": "Insulation2",
+            "layer_4": "GP01",
+            "outside_layer": "A1 - 1 IN STUCCO"
+        },
+        "FLOOR:LIVING": {
+            "layer_2": "Insulation2",
+            "layer_3": "CP02",
+            "outside_layer": "CC03"
+        },
+        "Gable FATM": {
+            "outside_layer": "Plywood FATM"
+        },
+        "Roof FATM": {
+            "layer_2": "Plywood FATM",
+            "outside_layer": "Shingles FATM"
+        },
+        "Trusses": {
+            "outside_layer": "Wood Trusses"
+        }
+    },
+    "Curve:Biquadratic": {
+        "WindACCoolCapFT": {
+            "coefficient1_constant": 0.942587793,
+            "coefficient2_x": 0.009543347,
+            "coefficient3_x_2": 0.00068377,
+            "coefficient4_y": -0.011042676,
+            "coefficient5_y_2": 5.249e-06,
+            "coefficient6_x_y": -9.72e-06,
+            "input_unit_type_for_x": "Temperature",
+            "input_unit_type_for_y": "Temperature",
+            "maximum_value_of_x": 23.88889,
+            "maximum_value_of_y": 46.11111,
+            "minimum_value_of_x": 12.77778,
+            "minimum_value_of_y": 18.0,
+            "output_unit_type": "Dimensionless"
+        },
+        "WindACEIRFT": {
+            "coefficient1_constant": 0.342414409,
+            "coefficient2_x": 0.034885008,
+            "coefficient3_x_2": -0.0006237,
+            "coefficient4_y": 0.004977216,
+            "coefficient5_y_2": 0.000437951,
+            "coefficient6_x_y": -0.000728028,
+            "input_unit_type_for_x": "Temperature",
+            "input_unit_type_for_y": "Temperature",
+            "maximum_value_of_x": 23.88889,
+            "maximum_value_of_y": 46.11111,
+            "minimum_value_of_x": 12.77778,
+            "minimum_value_of_y": 18.0,
+            "output_unit_type": "Dimensionless"
+        }
+    },
+    "Curve:Quadratic": {
+        "WindACCoolCapFFF": {
+            "coefficient1_constant": 0.8,
+            "coefficient2_x": 0.2,
+            "coefficient3_x_2": 0.0,
+            "maximum_value_of_x": 1.5,
+            "minimum_value_of_x": 0.5
+        },
+        "WindACEIRFFF": {
+            "coefficient1_constant": 1.1552,
+            "coefficient2_x": -0.1808,
+            "coefficient3_x_2": 0.0256,
+            "maximum_value_of_x": 1.5,
+            "minimum_value_of_x": 0.5
+        },
+        "WindACPLFFPLR": {
+            "coefficient1_constant": 0.85,
+            "coefficient2_x": 0.15,
+            "coefficient3_x_2": 0.0,
+            "maximum_value_of_x": 1.0,
+            "minimum_value_of_x": 0.0
+        }
+    },
+    "Fan:ConstantVolume": {
+        "Supply Fan 1": {
+            "air_inlet_node_name": "Air Loop Inlet Node",
+            "air_outlet_node_name": "Cooling Coil Air Inlet Node",
+            "availability_schedule_name": "HVACAvailSched",
+            "fan_total_efficiency": 0.7,
+            "maximum_flow_rate": 0.037,
+            "motor_efficiency": 0.9,
+            "motor_in_airstream_fraction": 1.0,
+            "pressure_rise": 400.0
+        }
+    },
+    "GlobalGeometryRules": {
+        "GlobalGeometryRules 1": {
+            "coordinate_system": "Relative",
+            "daylighting_reference_point_coordinate_system": "Relative",
+            "rectangular_surface_coordinate_system": "Relative",
+            "starting_vertex_position": "UpperLeftCorner",
+            "vertex_entry_direction": "Counterclockwise"
+        }
+    },
+    "HeatBalanceAlgorithm": {
+        "HeatBalanceAlgorithm 1": {
+            "algorithm": "ConductionTransferFunction"
+        }
+    },
+    "InternalMass": {
+        "TRUSSES": {
+            "construction_name": "Trusses",
+            "surface_area": 3.9,
+            "zone_or_zonelist_name": "Attic Thermal Zone"
+        }
+    },
+    "Material": {
+        "A1 - 1 IN STUCCO": {
+            "conductivity": 0.6918309,
+            "density": 1858.142,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.92,
+            "specific_heat": 836.8,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.025389841,
+            "visible_absorptance": 0.92
+        },
+        "CB11": {
+            "conductivity": 1.048,
+            "density": 1105.0,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.2,
+            "specific_heat": 837.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.2032,
+            "visible_absorptance": 0.2
+        },
+        "CC03": {
+            "conductivity": 1.31,
+            "density": 2243.0,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.65,
+            "specific_heat": 837.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.1016,
+            "visible_absorptance": 0.65
+        },
+        "GP01": {
+            "conductivity": 0.16,
+            "density": 801.0,
+            "roughness": "MediumSmooth",
+            "solar_absorptance": 0.75,
+            "specific_heat": 837.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.0127,
+            "visible_absorptance": 0.75
+        },
+        "Glass-fiber batts": {
+            "conductivity": 0.0351,
+            "density": 12,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 840,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.18542,
+            "visible_absorptance": 0.7
+        },
+        "Gypsum board": {
+            "conductivity": 0.16,
+            "density": 640,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 1150,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.013,
+            "visible_absorptance": 0.7
+        },
+        "HF-A3": {
+            "conductivity": 44.9696,
+            "density": 7689.0,
+            "roughness": "Smooth",
+            "solar_absorptance": 0.2,
+            "specific_heat": 418.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.0015,
+            "visible_absorptance": 0.2
+        },
+        "IN02": {
+            "conductivity": 0.043000001,
+            "density": 10.0,
+            "roughness": "Rough",
+            "solar_absorptance": 0.75,
+            "specific_heat": 837.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.090099998,
+            "visible_absorptance": 0.75
+        },
+        "IN05": {
+            "conductivity": 0.043000001,
+            "density": 10.0,
+            "roughness": "Rough",
+            "solar_absorptance": 0.75,
+            "specific_heat": 837.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.2458,
+            "visible_absorptance": 0.75
+        },
+        "Insulation": {
+            "conductivity": 0.034,
+            "density": 30,
+            "roughness": "Rough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 840,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.3,
+            "visible_absorptance": 0.7
+        },
+        "Insulation2": {
+            "conductivity": 0.034,
+            "density": 30,
+            "roughness": "Rough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 840,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.25,
+            "visible_absorptance": 0.7
+        },
+        "Insulation FATM": {
+            "conductivity": 0.0529757092,
+            "density": 99.99,
+            "roughness": "Rough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 970.3172847,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.19812,
+            "visible_absorptance": 0.7
+        },
+        "OSB": {
+            "conductivity": 0.1058,
+            "density": 650,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 1880,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.019,
+            "visible_absorptance": 0.7
+        },
+        "PW03": {
+            "conductivity": 0.115,
+            "density": 545.0,
+            "roughness": "MediumSmooth",
+            "solar_absorptance": 0.78,
+            "specific_heat": 1213.0,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.0127,
+            "visible_absorptance": 0.78
+        },
+        "Plywood FATM": {
+            "conductivity": 0.091,
+            "density": 460,
+            "roughness": "Rough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 1880,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.012701016,
+            "visible_absorptance": 0.7
+        },
+        "Roofing asphalt shingle": {
+            "conductivity": 0.122,
+            "density": 920,
+            "roughness": "Rough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 1260,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.009525,
+            "visible_absorptance": 0.7
+        },
+        "Shingles FATM": {
+            "conductivity": 0.1227,
+            "density": 920,
+            "roughness": "Rough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 1260,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.009525,
+            "visible_absorptance": 0.7
+        },
+        "Wood Trusses": {
+            "conductivity": 0.13,
+            "density": 500,
+            "roughness": "MediumRough",
+            "solar_absorptance": 0.7,
+            "specific_heat": 1630,
+            "thermal_absorptance": 0.9,
+            "thickness": 0.045,
+            "visible_absorptance": 0.7
+        }
+    },
+    "Material:NoMass": {
+        "AR02": {
+            "roughness": "VeryRough",
+            "solar_absorptance": 0.7,
+            "thermal_absorptance": 0.9,
+            "thermal_resistance": 0.078000002,
+            "visible_absorptance": 0.7
+        },
+        "CP02": {
+            "roughness": "Rough",
+            "solar_absorptance": 0.75,
+            "thermal_absorptance": 0.9,
+            "thermal_resistance": 0.217,
+            "visible_absorptance": 0.75
+        }
+    },
+    "NodeList": {
+        "Supply Air Temp Nodes": {
+            "nodes": [
+                {
+                    "node_name": "Heating Coil Air Inlet Node"
+                },
+                {
+                    "node_name": "Air Loop Outlet Node"
+                }
+            ]
+        },
+        "ZoneInlets": {
+            "nodes": [
+                {
+                    "node_name": "Zone Inlet Node"
+                }
+            ]
+        }
+    },
+    "Output:DebuggingData": {
+        "Output:DebuggingData 1": {
+            "report_debugging_data": "No",
+            "report_during_warmup": "No"
+        }
+    },
+    "Output:Surfaces:Drawing": {
+        "Output:Surfaces:Drawing 1": {
+            "report_type": "DXF"
+        }
+    },
+    "Output:Table:SummaryReports": {
+        "Output:Table:SummaryReports 1": {
+            "reports": [
+                {
+                    "report_name": "AllSummary"
+                }
+            ]
+        }
+    },
+    "Output:Variable": {
+        "Output:Variable 1": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "Site Outdoor Air Drybulb Temperature"
+        },
+        "Output:Variable 2": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "Zone Air Temperature"
+        },
+        "Output:Variable 3": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Zone Duct Conduction Sensible Heat Gain Rate"
+        },
+        "Output:Variable 4": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Zone Duct Conduction Sensible Heat Loss Rate"
+        },
+        "Output:Variable 5": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Zone Duct Radiation Heat Gain Rate"
+        },
+        "Output:Variable 6": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Zone Duct Radiation Heat Loss Rate"
+        },
+        "Output:Variable 7": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Node Temperature"
+        },
+        "Output:Variable 8": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Linkage Node 1 to Node 2 Mass Flow Rate"
+        },
+        "Output:Variable 9": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Linkage Node 2 to Node 1 Mass Flow Rate"
+        },
+        "Output:Variable 10": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Linkage Node 1 to Node 2 Volume Flow Rate"
+        },
+        "Output:Variable 11": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Linkage Node 2 to Node 1 Volume Flow Rate"
+        },
+        "Output:Variable 12": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "AFN Linkage Node 1 to Node 2 Pressure Difference"
+        },
+        "Output:Variable 13": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "Surface Inside Face Temperature"
+        },
+        "Output:Variable 14": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "Surface Outside Face Temperature"
+        },
+        "Output:Variable 15": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "Surface Inside Face Conduction Heat Transfer Rate per Area"
+        },
+        "Output:Variable 16": {
+            "key_value": "*",
+            "reporting_frequency": "Hourly",
+            "variable_name": "Surface Outside Face Conduction Heat Transfer Rate per Area"
+        }
+    },
+    "OutputControl:Table:Style": {
+        "OutputControl:Table:Style 1": {
+            "column_separator": "HTML"
+        }
+    },
+    "RunPeriod": {
+        "Run Period 1": {
+            "apply_weekend_holiday_rule": "No",
+            "begin_day_of_month": 1,
+            "begin_month": 1,
+            "day_of_week_for_start_day": "Tuesday",
+            "end_day_of_month": 31,
+            "end_month": 12,
+            "use_weather_file_daylight_saving_period": "Yes",
+            "use_weather_file_holidays_and_special_days": "Yes",
+            "use_weather_file_rain_indicators": "Yes",
+            "use_weather_file_snow_indicators": "Yes"
+        }
+    },
+    "Schedule:Compact": {
+        "HVACAvailSched": {
+            "data": [
+                {
+                    "field": "Through: 12/31"
+                },
+                {
+                    "field": "For: AllDays"
+                },
+                {
+                    "field": "Until: 24:00"
+                },
+                {
+                    "field": 1.0
+                }
+            ],
+            "schedule_type_limits_name": "Fraction"
+        },
+        "Heating/Cooling Setpoints": {
+            "data": [
+                {
+                    "field": "Through: 12/31"
+                },
+                {
+                    "field": "For: AllDays"
+                },
+                {
+                    "field": "Until: 24:00"
+                },
+                {
+                    "field": 23
+                }
+            ],
+            "schedule_type_limits_name": "Temperature"
+        },
+        "New Zone Control Type Sched": {
+            "data": [
+                {
+                    "field": "Through: 12/31"
+                },
+                {
+                    "field": "For: AllDays"
+                },
+                {
+                    "field": "Until: 24:00"
+                },
+                {
+                    "field": 3
+                }
+            ],
+            "schedule_type_limits_name": "Control Type"
+        }
+    },
+    "ScheduleTypeLimits": {
+        "Any Number": {},
+        "Control Type": {
+            "lower_limit_value": 0,
+            "numeric_type": "Discrete",
+            "upper_limit_value": 4
+        },
+        "Fraction": {
+            "lower_limit_value": 0.0,
+            "numeric_type": "Continuous",
+            "upper_limit_value": 1.0
+        },
+        "On/Off": {
+            "lower_limit_value": 0,
+            "numeric_type": "Discrete",
+            "upper_limit_value": 1
+        },
+        "Temperature": {
+            "lower_limit_value": -60,
+            "numeric_type": "Continuous",
+            "unit_type": "Temperature",
+            "upper_limit_value": 200
+        }
+    },
+    "SetpointManager:SingleZone:Reheat": {
+        "Supply Air Temp Manager": {
+            "control_variable": "Temperature",
+            "control_zone_name": "Occupied Thermal Zone",
+            "maximum_supply_air_temperature": 45.0,
+            "minimum_supply_air_temperature": 13.0,
+            "setpoint_node_or_nodelist_name": "Supply Air Temp Nodes",
+            "zone_inlet_node_name": "Zone Inlet Node",
+            "zone_node_name": "Zone Node"
+        }
+    },
+    "SimulationControl": {
+        "SimulationControl 1": {
+            "do_hvac_sizing_simulation_for_sizing_periods": "No",
+            "do_plant_sizing_calculation": "No",
+            "do_system_sizing_calculation": "No",
+            "do_zone_sizing_calculation": "No",
+            "maximum_number_of_hvac_sizing_simulation_passes": 1,
+            "run_simulation_for_sizing_periods": "Yes",
+            "run_simulation_for_weather_file_run_periods": "No"
+        }
+    },
+    "Site:GroundTemperature:BuildingSurface": {
+        "Site:GroundTemperature:BuildingSurface 1": {
+            "april_ground_temperature": 20.3,
+            "august_ground_temperature": 20.77,
+            "december_ground_temperature": 20.2,
+            "february_ground_temperature": 20.03,
+            "january_ground_temperature": 20.03,
+            "july_ground_temperature": 20.62,
+            "june_ground_temperature": 20.52,
+            "march_ground_temperature": 20.13,
+            "may_ground_temperature": 20.43,
+            "november_ground_temperature": 20.44,
+            "october_ground_temperature": 20.55,
+            "september_ground_temperature": 20.78
+        }
+    },
+    "Site:Location": {
+        "CHICAGO_IL_USA TMY2-94846": {
+            "elevation": 190.0,
+            "latitude": 41.78,
+            "longitude": -87.75,
+            "time_zone": -6.0
+        }
+    },
+    "SizingPeriod:DesignDay": {
+        "CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB": {
+            "barometric_pressure": 99063.0,
+            "daily_dry_bulb_temperature_range": 10.7,
+            "day_of_month": 21,
+            "day_type": "SummerDesignDay",
+            "daylight_saving_time_indicator": "No",
+            "humidity_condition_type": "WetBulb",
+            "maximum_dry_bulb_temperature": 31.5,
+            "month": 7,
+            "rain_indicator": "No",
+            "sky_clearness": 1.0,
+            "snow_indicator": "No",
+            "solar_model_indicator": "ASHRAEClearSky",
+            "wetbulb_or_dewpoint_at_maximum_dry_bulb": 23.0,
+            "wind_direction": 230,
+            "wind_speed": 5.3
+        },
+        "CHICAGO_IL_USA Annual Heating 99% Design Conditions DB": {
+            "barometric_pressure": 99063.0,
+            "daily_dry_bulb_temperature_range": 0.0,
+            "day_of_month": 21,
+            "day_type": "WinterDesignDay",
+            "daylight_saving_time_indicator": "No",
+            "humidity_condition_type": "WetBulb",
+            "maximum_dry_bulb_temperature": -17.3,
+            "month": 1,
+            "rain_indicator": "No",
+            "sky_clearness": 0.0,
+            "snow_indicator": "No",
+            "solar_model_indicator": "ASHRAEClearSky",
+            "wetbulb_or_dewpoint_at_maximum_dry_bulb": -17.3,
+            "wind_direction": 270,
+            "wind_speed": 4.9
+        }
+    },
+    "SurfaceConvectionAlgorithm:Inside": {
+        "SurfaceConvectionAlgorithm:Inside 1": {
+            "algorithm": "TARP"
+        }
+    },
+    "SurfaceConvectionAlgorithm:Outside": {
+        "SurfaceConvectionAlgorithm:Outside 1": {
+            "algorithm": "DOE-2"
+        }
+    },
+    "ThermostatSetpoint:SingleHeatingOrCooling": {
+        "Setpoints": {
+            "setpoint_temperature_schedule_name": "Heating/Cooling Setpoints"
+        }
+    },
+    "Timestep": {
+        "Timestep 1": {
+            "number_of_timesteps_per_hour": 6
+        }
+    },
+    "Version": {
+        "Version 1": {
+            "version_identifier": "23.2"
+        }
+    },
+    "WindowMaterial:Gas": {
+        "AIR 6MM": {
+            "gas_type": "Air",
+            "thickness": 0.006
+        }
+    },
+    "WindowMaterial:Glazing": {
+        "CLEAR 3MM": {
+            "back_side_infrared_hemispherical_emissivity": 0.84,
+            "back_side_solar_reflectance_at_normal_incidence": 0.075,
+            "back_side_visible_reflectance_at_normal_incidence": 0.081,
+            "conductivity": 0.9,
+            "front_side_infrared_hemispherical_emissivity": 0.84,
+            "front_side_solar_reflectance_at_normal_incidence": 0.075,
+            "front_side_visible_reflectance_at_normal_incidence": 0.081,
+            "infrared_transmittance_at_normal_incidence": 0.0,
+            "optical_data_type": "SpectralAverage",
+            "solar_transmittance_at_normal_incidence": 0.837,
+            "thickness": 0.003,
+            "visible_transmittance_at_normal_incidence": 0.898
+        }
+    },
+    "Zone": {
+        "Attic Thermal Zone": {
+            "direction_of_relative_north": 0,
+            "x_origin": 0,
+            "y_origin": 0,
+            "z_origin": 1.6
+        },
+        "Occupied Thermal Zone": {
+            "direction_of_relative_north": 0,
+            "x_origin": 0,
+            "y_origin": 0,
+            "z_origin": 0
+        }
+    },
+    "ZoneControl:Thermostat": {
+        "Zone Thermostat": {
+            "control_1_name": "Setpoints",
+            "control_1_object_type": "ThermostatSetpoint:SingleHeatingOrCooling",
+            "control_type_schedule_name": "New Zone Control Type Sched",
+            "zone_or_zonelist_name": "Occupied Thermal Zone"
+        }
+    },
+    "ZoneHVAC:AirDistributionUnit": {
+        "ZoneDirectAir ADU": {
+            "air_distribution_unit_outlet_node_name": "Zone Inlet Node",
+            "air_terminal_name": "ZoneDirectAir",
+            "air_terminal_object_type": "AirTerminal:SingleDuct:ConstantVolume:NoReheat"
+        }
+    },
+    "ZoneHVAC:EquipmentConnections": {
+        "ZoneHVAC:EquipmentConnections 1": {
+            "zone_air_inlet_node_or_nodelist_name": "ZoneInlets",
+            "zone_air_node_name": "Zone Node",
+            "zone_conditioning_equipment_list_name": "ZoneEquipment",
+            "zone_name": "Occupied Thermal Zone",
+            "zone_return_air_node_or_nodelist_name": "Zone Outlet Node"
+        }
+    },
+    "ZoneHVAC:EquipmentList": {
+        "ZoneEquipment": {
+            "equipment": [
+                {
+                    "zone_equipment_cooling_sequence": 1,
+                    "zone_equipment_heating_or_no_load_sequence": 1,
+                    "zone_equipment_name": "ZoneDirectAir ADU",
+                    "zone_equipment_object_type": "ZoneHVAC:AirDistributionUnit"
+                }
+            ],
+            "load_distribution_scheme": "SequentialLoad"
+        }
+    }
+}
