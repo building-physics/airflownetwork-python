@@ -1,0 +1,36 @@
+{
+    "distribution_link_histogram": {
+        "2": 21,
+        "4": 3,
+        "3": 4,
+        "1": 6
+    },
+    "multizone_link_histogram": {
+        "11": 1,
+        "9": 1,
+        "12": 1,
+        "14": 1,
+        "4": 20,
+        "8": 2,
+        "6": 8
+    },
+    "max_multizone_links": {
+        "zone": "ATTIC ZONE",
+        "afn_zone": "ATTIC ZONE",
+        "count": 14
+    },
+    "external_link_histogram": {
+        "3": 2,
+        "2": 1,
+        "4": 1,
+        "0": 30
+    },
+    "max_external_links": {
+        "zone": "NORTH ZONE",
+        "afn_zone": "NORTH ZONE",
+        "count": 4
+    },
+    "duplicate distribution nodes": false,
+    "multizone connected": true,
+    "connected": true
+}

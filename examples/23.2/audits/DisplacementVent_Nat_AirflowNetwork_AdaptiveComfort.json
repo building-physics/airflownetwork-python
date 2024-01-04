@@ -1,0 +1,24 @@
+{
+    "distribution_link_histogram": {
+        "0": 1
+    },
+    "multizone_link_histogram": {
+        "3": 1
+    },
+    "max_multizone_links": {
+        "zone": "ZONE ONE",
+        "afn_zone": "ZONE ONE",
+        "count": 3
+    },
+    "external_link_histogram": {
+        "3": 1
+    },
+    "max_external_links": {
+        "zone": "ZONE ONE",
+        "afn_zone": "ZONE ONE",
+        "count": 3
+    },
+    "duplicate distribution nodes": false,
+    "multizone connected": true,
+    "connected": true
+}

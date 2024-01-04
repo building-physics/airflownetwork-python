@@ -1,0 +1,41 @@
+{
+    "distribution_link_histogram": {
+        "2": 31,
+        "3": 6,
+        "1": 8,
+        "4": 2
+    },
+    "multizone_link_histogram": {
+        "11": 1,
+        "9": 1,
+        "12": 2,
+        "6": 10,
+        "4": 30,
+        "2": 1,
+        "8": 2
+    },
+    "max_multizone_links": {
+        "zone": "NORTH ZONE",
+        "afn_zone": "NORTH ZONE",
+        "count": 12
+    },
+    "external_link_histogram": {
+        "3": 1,
+        "2": 2,
+        "4": 1,
+        "1": 1,
+        "0": 42
+    },
+    "max_external_links": {
+        "zone": "NORTH ZONE",
+        "afn_zone": "NORTH ZONE",
+        "count": 4
+    },
+    "duplicate distribution nodes": false,
+    "multizone connected": false,
+    "messages": [
+        "Multizone network is not fully connected",
+        "Network (multizone + distribution) is not fully connected"
+    ],
+    "connected": false
+}

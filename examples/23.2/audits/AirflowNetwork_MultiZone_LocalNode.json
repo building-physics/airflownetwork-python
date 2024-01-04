@@ -1,0 +1,33 @@
+{
+    "distribution_link_histogram": {
+        "2": 14,
+        "1": 4
+    },
+    "multizone_link_histogram": {
+        "7": 1,
+        "5": 2,
+        "4": 13,
+        "6": 2
+    },
+    "max_multizone_links": {
+        "zone": "LIVING ZONE",
+        "afn_zone": "LIVING ZONE",
+        "count": 7
+    },
+    "external_link_histogram": {
+        "1": 3,
+        "0": 15
+    },
+    "max_external_links": {
+        "zone": "LIVING ZONE",
+        "afn_zone": "LIVING ZONE",
+        "count": 1
+    },
+    "duplicate distribution nodes": false,
+    "multizone connected": false,
+    "messages": [
+        "Multizone network is not fully connected",
+        "Network (multizone + distribution) is not fully connected"
+    ],
+    "connected": false
+}

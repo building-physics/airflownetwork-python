@@ -1,0 +1,30 @@
+{
+    "distribution_link_histogram": {
+        "0": 4
+    },
+    "multizone_link_histogram": {
+        "3": 3,
+        "5": 1
+    },
+    "max_multizone_links": {
+        "zone": "East_Zone",
+        "afn_zone": "EAST_ZONE",
+        "count": 5
+    },
+    "external_link_histogram": {
+        "3": 3,
+        "5": 1
+    },
+    "max_external_links": {
+        "zone": "East_Zone",
+        "afn_zone": "EAST_ZONE",
+        "count": 5
+    },
+    "duplicate distribution nodes": false,
+    "multizone connected": false,
+    "messages": [
+        "Multizone network is not fully connected",
+        "Network (multizone + distribution) is not fully connected"
+    ],
+    "connected": false
+}

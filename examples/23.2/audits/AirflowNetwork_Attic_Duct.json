@@ -1,0 +1,33 @@
+{
+    "distribution_link_histogram": {
+        "0": 1,
+        "2": 13,
+        "1": 2
+    },
+    "multizone_link_histogram": {
+        "2": 1,
+        "6": 1,
+        "4": 14
+    },
+    "max_multizone_links": {
+        "zone": "Occupied Thermal Zone",
+        "afn_zone": "OCCUPIED THERMAL ZONE",
+        "count": 6
+    },
+    "external_link_histogram": {
+        "2": 2,
+        "0": 14
+    },
+    "max_external_links": {
+        "zone": "Attic Thermal Zone",
+        "afn_zone": "ATTIC THERMAL ZONE",
+        "count": 2
+    },
+    "duplicate distribution nodes": false,
+    "multizone connected": false,
+    "messages": [
+        "Multizone network is not fully connected",
+        "Network (multizone + distribution) is not fully connected"
+    ],
+    "connected": false
+}

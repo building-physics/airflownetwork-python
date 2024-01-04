@@ -1,0 +1,30 @@
+{
+    "distribution_link_histogram": {
+        "2": 13,
+        "1": 4
+    },
+    "multizone_link_histogram": {
+        "8": 1,
+        "5": 2,
+        "4": 12,
+        "6": 2
+    },
+    "max_multizone_links": {
+        "zone": "LIVING ZONE",
+        "afn_zone": "LIVING ZONE",
+        "count": 8
+    },
+    "external_link_histogram": {
+        "2": 1,
+        "1": 2,
+        "0": 14
+    },
+    "max_external_links": {
+        "zone": "LIVING ZONE",
+        "afn_zone": "LIVING ZONE",
+        "count": 2
+    },
+    "duplicate distribution nodes": false,
+    "multizone connected": true,
+    "connected": true
+}

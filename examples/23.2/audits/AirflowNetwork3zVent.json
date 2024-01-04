@@ -1,0 +1,26 @@
+{
+    "distribution_link_histogram": {
+        "0": 3
+    },
+    "multizone_link_histogram": {
+        "7": 2,
+        "4": 1
+    },
+    "max_multizone_links": {
+        "zone": "WEST_ZONE",
+        "afn_zone": "WEST_ZONE",
+        "count": 7
+    },
+    "external_link_histogram": {
+        "4": 2,
+        "2": 1
+    },
+    "max_external_links": {
+        "zone": "WEST_ZONE",
+        "afn_zone": "WEST_ZONE",
+        "count": 4
+    },
+    "duplicate distribution nodes": false,
+    "multizone connected": true,
+    "connected": true
+}
