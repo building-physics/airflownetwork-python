@@ -110,7 +110,6 @@ class Auditor(BaseAuditor):
         self.relative_geometry = False
         self.vertex_ccw = True
         self.no_distribution = no_distribution
-        self.has_intrazone = False
         # Figure out what is what
         if 'GlobalGeometryRules' in self.model:
             obj = next(iter(self.model['GlobalGeometryRules'].values()))
@@ -140,7 +139,7 @@ class Auditor(BaseAuditor):
             'AirflowNetwork:Distribution:Node': self.distribution_nodes,
             'AirflowNetwork:Distribution:Linkage': self.distribution_links,
             'AirflowNetwork:IntraZone:Node':self.intrazone_nodes,
-            'AirflowNetwork:IntraZone:Link':self.intrazone_links
+            'AirflowNetwork:IntraZone:Linkage':self.intrazone_links
         }
         # Load the simcontrol object
         try:
@@ -151,9 +150,9 @@ class Auditor(BaseAuditor):
             )
             return False
         # Check for intrazone links and nodes
-        self.has_intrazone = ('AirflowNetwork:IntraZone:Node' in self.model) and (
-            'AirflowNetwork:IntraZone:Linkage' in self.model
-        )
+        #self.has_intrazone = ('AirflowNetwork:IntraZone:Node' in self.model) and (
+        #    'AirflowNetwork:IntraZone:Linkage' in self.model
+        #)
         # Handle the wind pressure coefficients, should maybe remove these from the model once we're done
         try:
             wpa = next(
@@ -253,6 +252,12 @@ class Auditor(BaseAuditor):
                 '%s -- %s\n'
                 % (surf['nodes'][0]['display_name'], surf['nodes'][1]['display_name'])
             )
+        print(len(self.intrazone_links))
+        for name, link in self.intrazone_links.items():
+            fp.write(
+                '%s -- %s\n'
+                % (link['nodes'][0]['display_name'], link['nodes'][1]['display_name'])
+            )
         fp.write('}\n')
 
     def summarize(self):
@@ -284,7 +289,9 @@ class Auditor(BaseAuditor):
             node['is_distribution'] = True
         for name, link in self.distribution_links.items():
             node_names = (link['node_1_name'].upper(), link['node_2_name'].upper())
+            link['nodes'] = []
             for node_name in node_names:
+                link['nodes'].append(self.internal_nodes[node_name])
                 self.internal_nodes[node_name]['link_count'] += 1
             # Count the numbers of connections
             self.internal_nodes[node_names[1]]['link_count'] += 1
@@ -336,8 +343,8 @@ class Auditor(BaseAuditor):
 
         outdoor_count = 0
 
+        # Handle the surfaces
         for name, surf in self.surfs.items():
-            print('###', name)
             window = None
             try:
                 htsurf = htsurfs[surf['surface_name']]
@@ -470,6 +477,25 @@ class Auditor(BaseAuditor):
                 raise BadModel('Failed to resolve linked nodes for AirflowNetwork surface "' + name + '"')
 
             surf['nodes'] = [afnzone, other_node]
+        
+        # Handle the intrazone links
+        for name, link in self.intrazone_links.items():
+            node_names = (link['node_1_name'].upper(), link['node_2_name'].upper())
+            link['nodes'] = []
+            for node_name in node_names:
+                link['nodes'].append(self.internal_nodes[node_name])
+                self.internal_nodes[node_name]['link_count'] += 1
+            # Count the numbers of connections
+            self.internal_nodes[node_names[1]]['link_count'] += 1
+            if node_names[0] in self.internal_nodes[node_names[1]]['neighbors']:
+                self.internal_nodes[node_names[1]]['neighbors'][node_names[0]] += 1
+            else:
+                self.internal_nodes[node_names[1]]['neighbors'][node_names[0]] = 1
+            self.internal_nodes[node_names[0]]['link_count'] += 1
+            if node_names[1] in self.internal_nodes[node_names[0]]['neighbors']:
+                self.internal_nodes[node_names[0]]['neighbors'][node_names[1]] += 1
+            else:
+                self.internal_nodes[node_names[0]]['neighbors'][node_names[1]] = 1
         return True
 
     def get_neighbors(self, no_distribution=True):
@@ -617,37 +643,33 @@ class Auditor(BaseAuditor):
             if duplicates:
                 self.json['duplicate distribution nodes'] = True
 
-        if not self.has_intrazone:
-            #
-            # Check connectedness of the model, first multizone only
-            #
-            neighbors = self.get_neighbors()
+        #
+        # Check connectedness of the model, first multizone only
+        #
+        neighbors = self.get_neighbors()
+        starter = next(iter(neighbors.keys()))
+        connectedness(neighbors, starter)
+        # Check that the starter node is connected to the rest of the nodes,
+        # which will be true if the neighbors dictionary is empty
+        self.json['multizone connected'] = True
+        if neighbors:
+            self.json['multizone connected'] = False
+            self.add_message('Multizone network is not fully connected')
+
+        #
+        # Check distribution if needed
+        #
+        self.json['connected'] = self.json['multizone connected']
+        # print(self.internal_nodes.keys())
+        if not self.no_distribution:
+            neighbors = self.get_neighbors(no_distribution=False)
             starter = next(iter(neighbors.keys()))
             connectedness(neighbors, starter)
             # Check that the starter node is connected to the rest of the nodes,
             # which will be true if the neighbors dictionary is empty
-            self.json['multizone connected'] = True
+            self.json['connected'] = True
             if neighbors:
-                self.json['multizone connected'] = False
-                self.add_message('Multizone network is not fully connected')
-
-            #
-            # Check distribution if needed
-            #
-            self.json['connected'] = self.json['multizone connected']
-            # print(self.internal_nodes.keys())
-            if not self.no_distribution:
-                neighbors = self.get_neighbors(no_distribution=False)
-                starter = next(iter(neighbors.keys()))
-                connectedness(neighbors, starter)
-                # Check that the starter node is connected to the rest of the nodes,
-                # which will be true if the neighbors dictionary is empty
-                self.json['connected'] = True
-                if neighbors:
-                    self.json['connected'] = False
-                    self.add_message(
-                        'Network (multizone + distribution) is not fully connected'
-                    )
-
-        else:
-            self.add_message('Intrazone data found, skipping connectedness tests')
+                self.json['connected'] = False
+                self.add_message(
+                    'Network (multizone + distribution) is not fully connected'
+                )
