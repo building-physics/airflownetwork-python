@@ -1,0 +1,4 @@
+graph linkages {
+Z0 -- E0
+Z0 -- E1
+}

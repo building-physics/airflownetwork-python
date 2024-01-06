@@ -7,18 +7,19 @@ import airflownetwork
 import json
 
 files = glob.glob('../examples/23.2/models/*.epJSON')
+graph_dir = '../examples/23.2/graphs/'
 
 # Graphs
-graph = False
+graph = True
 graph_failed = []
 if graph:
     for file in files:
         basename = os.path.splitext(os.path.basename(file))[0]
         print(basename)
-        model = airflownetwork.load_epjson(file)        
+        model = airflownetwork.load_epjson(file)     
         try:
             auditor = airflownetwork.Auditor(model)
-            with open(basename + '.dot', 'w') as fp:
+            with open(os.path.join(graph_dir, basename + '.dot'), 'w') as fp:
                 auditor.write_dot(fp)
         except Exception as exc:
             graph_failed.append(file)

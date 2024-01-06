@@ -7,11 +7,35 @@ import io
 
 versions = ['23.2']
 file_basenames = [
+    'AirflowNetwork3zVent',
+    'AirflowNetworkAdvanced_SingleSided_NV',
+    'AirflowNetworkOccupantVentilationControl',
+    'AirflowNetwork_Attic_Duct',
+    'AirflowNetwork_Multizone_HorizontalOpening',
     'AirflowNetwork_MultiZone_House',
-    'AirflowNetwork_Simple_SmallOffice',
-    'RoomAirflowNetwork',
+    'AirflowNetwork_MULTIZONE_House_DuctSizing',
+    'AirflowNetwork_MultiZone_House_FanModel',
+    'AirflowNetwork_MultiZone_House_OvercoolDehumid',
+    'AirflowNetwork_MultiZone_House_TwoSpeed',
+    'AirflowNetwork_MultiZone_SmallOffice',
+    'AirflowNetwork_MultiZone_SmallOffice_CoilHXAssistedDX',
+    'AirflowNetwork_MultiZone_SmallOffice_GenericContam',
+    'AirflowNetwork_MultiZone_SmallOffice_HeatRecoveryHXSL',
+    'AirflowNetwork_MultiZone_SmallOffice_VAV',
+    'AirflowNetwork_PressureControl',
     'AirflowNetwork_Simple_House',
-    'AirflowNetwork_Multizone_SmallOffice',
+    'AirflowNetwork_Simple_SmallOffice',
+    'CrossVent_1Zone_AirflowNetwork',
+    'CrossVent_1Zone_AirflowNetwork_with2CrossflowJets',
+    'DisplacementVent_Nat_AirflowNetwork',
+    'DisplacementVent_Nat_AirflowNetwork_AdaptiveComfort',
+    'EMSAirflowNetworkOpeningControlByHumidity',
+    'HybridVentilationControl',
+    'PythonPluginAirflowNetworkOpeningControlByHumidity',
+    'RoomAirflowNetwork',
+    'AirflowNetwork3zVentAutoWPC',
+    'AirflowNetwork_MultiZone_LocalNode',
+    'AirflowNetwork_MultiAirLoops'
 ]
 parameters = itertools.product(versions, file_basenames)
 

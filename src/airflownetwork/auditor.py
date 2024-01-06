@@ -99,6 +99,8 @@ class Auditor(BaseAuditor):
         self.internal_nodes = {}
         self.multizone_nodes = {}
         self.external_nodes = {}
+        self.intrazone_nodes = {}
+        self.intrazone_links = {}
         self.distribution_nodes = {}
         self.distribution_links = {}
         self.surfs = {}
@@ -137,7 +139,8 @@ class Auditor(BaseAuditor):
             'OutdoorAir:Node': self.external_nodes,
             'AirflowNetwork:Distribution:Node': self.distribution_nodes,
             'AirflowNetwork:Distribution:Linkage': self.distribution_links,
-            #'AirflowNetwork:IntraZone:Node':self.nodes
+            'AirflowNetwork:IntraZone:Node':self.intrazone_nodes,
+            'AirflowNetwork:IntraZone:Link':self.intrazone_links
         }
         # Load the simcontrol object
         try:
@@ -194,6 +197,8 @@ class Auditor(BaseAuditor):
             self.internal_nodes[value['zone_name'].upper()] = value
         for key, value in self.distribution_nodes.items():
             self.internal_nodes[key.upper()] = value
+        for key, value in self.intrazone_nodes.items():
+            self.internal_nodes[key.upper()] = value
         return True
 
     def summarize_model(self, json_output=False):
@@ -233,10 +238,17 @@ class Auditor(BaseAuditor):
         for name, node in self.multizone_nodes.items():
             node['display_name'] = 'Z%d' % count
             count += 1
+        count = 0
+        for name, node in self.distribution_nodes.items():
+            node['display_name'] = 'D%d' % count
+            count += 1
+        count = 0
+        for name, node in self.intrazone_nodes.items():
+            node['display_name'] = 'I%d' % count
+            count += 1
 
         fp.write('graph linkages {\n')
         for name, surf in self.surfs.items():
-            # print(surf)
             fp.write(
                 '%s -- %s\n'
                 % (surf['nodes'][0]['display_name'], surf['nodes'][1]['display_name'])
@@ -299,6 +311,13 @@ class Auditor(BaseAuditor):
             node['neighbors'] = {}
             node['is_distribution'] = False
 
+        for name, node in self.intrazone_nodes.items():
+            node['link_count'] = 0
+            node['external_connections'] = 0
+            node['distribution_connections'] = 0
+            node['neighbors'] = {}
+            node['is_distribution'] = False
+
         for name, node in self.external_nodes.items():
             node['link_count'] = 0
             node['neighbors'] = {}
@@ -318,6 +337,7 @@ class Auditor(BaseAuditor):
         outdoor_count = 0
 
         for name, surf in self.surfs.items():
+            print('###', name)
             window = None
             try:
                 htsurf = htsurfs[surf['surface_name']]
@@ -343,7 +363,20 @@ class Auditor(BaseAuditor):
 
             bc = htsurf['outside_boundary_condition']
 
-            linked_nodes = []
+            # Find the associated internal zone
+            zone_name = htsurf['zone_name'].upper()
+            afnzone = None
+            if zone_name in self.internal_nodes: # should probably be using just the mz nodes here
+                afnzone = self.internal_nodes[zone_name]
+            else:
+                raise BadModel(
+                    'Failed to find AirflowNetwork zone for thermal zone "'
+                    + zone_name
+                    + '"'
+                )
+            
+            # Figure out what the other node is
+            other_node = None
             if bc == 'Outdoors':
                 outdoor_count += 1
                 try:
@@ -377,71 +410,66 @@ class Auditor(BaseAuditor):
                             + '"'
                         )
                 external_node['link_count'] += 1
-                zone_name = htsurf['zone_name']
-                # Find the multizone zone that points at this zone
-                afnzone = None
-                for name, node in self.multizone_nodes.items():
-                    if node['zone_name'] == zone_name:
-                        afnzone = node
-                        node['link_count'] += 1
-                        node['external_connections'] += 1
-                        if surf['external_node_name'] in node['neighbors']:
-                            node['neighbors'][surf['external_node_name']] += 1
-                        else:
-                            node['neighbors'][surf['external_node_name']] = 1
-                        if zone_name in external_node['neighbors']:
-                            external_node['neighbors'][zone_name] += 1
-                        else:
-                            external_node['neighbors'][zone_name] = 1
-                        break
-                if afnzone is None:
-                    raise BadModel(
-                        'Failed to find AirflowNetwork zone for thermal zone "'
-                        + zone_name
-                        + '"'
-                    )
-                linked_nodes = [afnzone, external_node]
+                
+                afnzone['link_count'] += 1
+                afnzone['external_connections'] += 1
+                if surf['external_node_name'] in afnzone['neighbors']:
+                    afnzone['neighbors'][surf['external_node_name']] += 1
+                else:
+                    afnzone['neighbors'][surf['external_node_name']] = 1
+                if zone_name in external_node['neighbors']:
+                    external_node['neighbors'][zone_name] += 1
+                else:
+                    external_node['neighbors'][zone_name] = 1
+
+                other_node = external_node
             elif bc == 'Surface':
-                zone_name = htsurf['zone_name']
-                # Find the multizone zone that points at this zone
-                afnzone = None
-                for name, node in self.multizone_nodes.items():
-                    if node['zone_name'] == zone_name:
-                        afnzone = node
-                        node['link_count'] += 1
-                        break
-                if afnzone is None:
-                    raise BadModel(
-                        'Failed to find AirflowNetwork zone for thermal zone "'
-                        + zone_name
-                        + '"'
-                    )
-                linked_nodes = [afnzone]
+                afnzone['link_count'] += 1
+
                 adjhtsurf = htsurfs[htsurf['outside_boundary_condition_object']]
                 adj_zone_name = adjhtsurf['zone_name'].upper()
-                adj_afnzone = None
-                for name, node in self.multizone_nodes.items():
-                    if node['zone_name'] == adj_zone_name:
-                        adj_afnzone = node
-                        node['link_count'] += 1
-                        break
-                if adj_afnzone is None:
+                if adj_zone_name in self.internal_nodes: # Still probably only need to do use the mz nodes
+                    other_node = self.internal_nodes[adj_zone_name]
+                else:
                     raise BadModel(
                         'Failed to find AirflowNetwork zone for adjacent thermal zone "'
                         + adj_zone_name
                         + '"'
                     )
-                linked_nodes.append(adj_afnzone)
+                other_node['link_count'] += 1
                 if adj_zone_name in afnzone['neighbors']:
                     afnzone['neighbors'][adj_zone_name] += 1
                 else:
                     afnzone['neighbors'][adj_zone_name] = 1
-                if zone_name in adj_afnzone['neighbors']:
-                    adj_afnzone['neighbors'][zone_name] += 1
+                if zone_name in other_node['neighbors']:
+                    other_node['neighbors'][zone_name] += 1
                 else:
-                    adj_afnzone['neighbors'][zone_name] = 1
+                    other_node['neighbors'][zone_name] = 1
+            elif bc == 'Zone':
+                afnzone['link_count'] += 1
+                adj_zone_name = htsurf['outside_boundary_condition_object'].upper()
+                if adj_zone_name in self.internal_nodes: # Still probably only need to do use the mz nodes
+                    other_node = self.internal_nodes[adj_zone_name]
+                else:
+                    raise BadModel(
+                        'Failed to find AirflowNetwork zone for adjacent thermal zone "'
+                        + adj_zone_name
+                        + '"'
+                    )
+                other_node['link_count'] += 1
+                if adj_zone_name in afnzone['neighbors']:
+                    afnzone['neighbors'][adj_zone_name] += 1
+                else:
+                    afnzone['neighbors'][adj_zone_name] = 1
+                if zone_name in other_node['neighbors']:
+                    other_node['neighbors'][zone_name] += 1
+                else:
+                    other_node['neighbors'][zone_name] = 1
 
-            surf['nodes'] = linked_nodes
+            if other_node is None:
+                raise BadModel('Failed to resolve linked nodes for AirflowNetwork surface "' + name + '"')
+
+            surf['nodes'] = [afnzone, other_node]
         return True
 
     def get_neighbors(self, no_distribution=True):

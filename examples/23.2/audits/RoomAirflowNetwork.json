@@ -1,11 +1,12 @@
 {
     "distribution_link_histogram": {
-        "0": 5
+        "0": 10
     },
     "multizone_link_histogram": {
-        "6": 2,
-        "4": 2,
-        "14": 1
+        "7": 2,
+        "5": 2,
+        "14": 1,
+        "0": 5
     },
     "max_multizone_links": {
         "zone": "NORTH_ZONE",
@@ -15,7 +16,8 @@
     "external_link_histogram": {
         "3": 2,
         "2": 2,
-        "8": 1
+        "8": 1,
+        "0": 5
     },
     "max_external_links": {
         "zone": "NORTH_ZONE",

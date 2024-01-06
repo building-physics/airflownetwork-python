@@ -1,0 +1,16 @@
+graph linkages {
+Z3 -- E0
+Z3 -- E1
+Z2 -- E2
+Z2 -- E3
+Z1 -- E4
+Z1 -- E5
+Z0 -- E6
+Z0 -- E7
+Z1 -- E8
+Z1 -- E9
+Z1 -- E10
+Z0 -- E11
+Z2 -- E12
+Z3 -- E13
+}

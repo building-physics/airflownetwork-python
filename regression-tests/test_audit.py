@@ -6,7 +6,6 @@ import itertools
 import json
 import pytest
 import os
-import io
 
 versions = ['23.2']
 file_basenames = [
