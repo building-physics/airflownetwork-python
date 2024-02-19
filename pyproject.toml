@@ -70,8 +70,10 @@ exclude_lines = [
 [tool.ruff.format]
 quote-style = "single"
 
-[tool.ruff.lint]
+[tool.ruff]
 line-length = 92
+
+[tool.ruff.lint]
 ignore = ["E731"]
 
 [tool.ruff.lint.per-file-ignores]
