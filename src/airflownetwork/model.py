@@ -4,4 +4,6 @@
 import airnet
 
 class Model(airnet.Model):
-    pass
+    @classmethod
+    def from_json(cls, json):
+        pass
