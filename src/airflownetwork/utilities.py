@@ -1,5 +1,7 @@
 # SPDX-FileCopyrightText: 2023-present Oak Ridge National Laboratory, managed by UT-Battelle
 #
 # SPDX-License-Identifier: BSD-3-Clause
-from .auditor import Auditor, BadModel, load_epjson
-from .model import Model
+import airnet
+
+class Model(airnet.Model):
+    pass

@@ -26,7 +26,8 @@ classifiers = [
 ]
 dependencies = [
   "click",
-  "airnet>=1.1.0"
+  "numpy",
+  "scipy"
 ]
 dynamic = ["version"]
 

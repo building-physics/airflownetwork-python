@@ -15,9 +15,9 @@ class PowerLaw:
     exponent: optional
         The nonlinear flow exponent used in simulation.
     """
-    def __init__(self, linear:float=0.0, ceofficient:float=0.0, exponent:float=0.65):
+    def __init__(self, linear:float=0.0, coefficient:float=0.0, exponent:float=0.65):
         self.linear = linear # linear flow coefficient
-        self.coefficient = ceofficient # nonlinear flow coefficient
+        self.coefficient = coefficient # nonlinear flow coefficient
         self.exponent = exponent # nonlinear flow exponent
 
     def type(self):
