@@ -252,7 +252,7 @@ class Auditor(BaseAuditor):
                 '%s -- %s\n'
                 % (surf['nodes'][0]['display_name'], surf['nodes'][1]['display_name'])
             )
-        print(len(self.intrazone_links))
+        #print(len(self.intrazone_links))
         for name, link in self.intrazone_links.items():
             fp.write(
                 '%s -- %s\n'

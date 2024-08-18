@@ -2,11 +2,10 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 from __future__ import annotations # Remove when dropping 3.9
-import argparse
-import os
 import math
 import scipy
 import numpy
+from typing import Type
 from .powerlaw import PowerLaw, SqrtPowerLaw
 
 object_lookup = {"plr": PowerLaw, "sqrt_plr": SqrtPowerLaw}
@@ -140,8 +139,8 @@ class Model:
            raise BadNetwork('Disconnected nodes found: %s' % ', '.join([el.name for el in problems]))
     
     @classmethod
-    def from_json(cls, data:dict, element_lookup:dict = object_lookup, node_object=Node,
-                 link_object=Link, global_temperature:float=None, global_density:float=None):
+    def from_json(cls, data:dict, element_lookup:dict = object_lookup, node_object:Type[Node]=Node,
+                 link_object:Type[Link]=Link, global_temperature:float=None, global_density:float=None):
         """Read a model from JSON data.
         
         Parameters
@@ -156,8 +155,11 @@ class Model:
 
         Raises
         ------
+        BadNetwork:
             Raised if the network is bad.
         """
+        global_density = data.get('global_density', global_density)
+        global_temperature = data.get('global_temperature', global_temperature)
         nodes = {}
         for name, node in data['nodes'].items():
             nodes[name] = node_object(name=name, **node)
@@ -288,11 +290,11 @@ class Model:
         self.A.data.fill(0.0)
         self.x.fill(0.0)
         for link in self.links:
-            if link.node0.variable:
+            if link.node0.variable_pressure:
                 c = link.element.linearize(link)
                 # diagonal term
                 self.A[link.node0.index, link.node0.index] += c
-                if link.node1.variable:
+                if link.node1.variable_pressure:
                     # diagonal term
                     self.A[link.node1.index, link.node1.index] += c
                     # off diagonal terms
@@ -331,7 +333,7 @@ class Model:
             # Wind pressure contribution goes here
             link.pdrop =  sp0 + sp1 + spx
 
-    def air_movement(self, maxiter:int=100, max_subiter:int=100, tolerance:float=1.0e-8, status_function=devnull):
+    def air_movement(self, maxiter:int=100, max_subiter:int=100, tolerance:float=1.0e-8, status_function=None):
         """Compute steady airflows in the model.
         
         Parameters
@@ -350,20 +352,22 @@ class Model:
         int:
             The number of Newton iterations used in the solve.
         """
+        if status_function is None:
+            status_function = devnull
         self.compute_pressure_drops()
         status_function('iter | Max Resid|\n==== ===============')
         for iter in range(1,maxiter+1):
             self.A.data.fill(0.0)
             self.x.fill(0.0)
             for link in self.links:
-                if link.node0.variable:
+                if link.node0.variable_pressure:
                     pdrop = link.node0.pressure - link.node1.pressure + link.pdrop
                     nf, link.flow0, link.flow1, df0, df1 = link.element.jacobian(link, pdrop)
                     if nf == 1:
                         # diagonal term
                         self.A[link.node0.index, link.node0.index] += df0
                         self.x[link.node0.index] += link.flow0
-                        if link.node1.variable:
+                        if link.node1.variable_pressure:
                             # diagonal term
                             self.A[link.node1.index, link.node1.index] += df0
                             self.x[link.node1.index] -= link.flow0
@@ -380,7 +384,7 @@ class Model:
                 status_function('%4d %15.9e < %e' % (iter, maxf, tolerance))
                 # Update the pressure drops, up until now only secondary terms present
                 for link in self.links:
-                    if link.node0.variable:
+                    if link.node0.variable_pressure:
                         link.pdrop += link.node0.pressure - link.node1.pressure
                 return iter
             info = 0
@@ -401,5 +405,7 @@ def write_results_csv(nodes, links, csv_file_name: str)   :
                                                                node.temperature, node.density))
     fp.write('link header, name, time id, pressure drop, flow0, flow1\n')
     for link in links:
+        if link.flipped:
+            raise 'STOPSTOPSTOP'
         fp.write('link, %s, 0, %21.15e, %21.15e, %21.15e\n' % (link.name, link.pdrop, link.flow0, link.flow1))
     fp.close()

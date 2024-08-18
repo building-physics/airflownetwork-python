@@ -2,4 +2,5 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 from .auditor import Auditor, BadModel, load_epjson
-from .model import Model
+from .model import Model, write_results_csv
+from .utilities import temporary_directory, compare_csvs
