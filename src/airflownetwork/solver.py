@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #from __future__ import annotations # Remove when dropping 3.9
 import scipy
-import numpy as np
 
 def devnull(msg: str):
     return
