@@ -2,7 +2,10 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 import enum
-from typing import Self
+try:
+    from typing import Self
+except ImportError:
+    Self = None
 
 def urban_function():
     return (0.35, 0.4)
