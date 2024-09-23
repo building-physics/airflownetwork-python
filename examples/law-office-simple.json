@@ -1,0 +1,217 @@
+{
+    "title": "Simplified law office case",
+    "global_density": 1.2040973677927915,
+    "nodes": {
+        "office-1": {
+            "height": 0.0,
+            "temperature": 20.0
+        },
+        "office-2": {
+            "height": 0.0,
+            "temperature": 20.0
+        },
+        "library": {
+            "height": 0.0,
+            "temperature": 20.0
+        },
+        "hallway": {
+            "height": 0.0,
+            "temperature": 20.0
+        },
+        "n-lib": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 15.0
+        },
+        "n-off-2": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 15.0
+        },
+        "e-off-2": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 5.0
+        },
+        "e-off-1": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 5.0
+        },
+        "s-off-1": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": -15.0
+        },
+        "s-hall": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": -15.0
+        },
+        "s-lib": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": -15.0
+        },
+        "w-lib": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": -5.0
+        }
+    },
+    "elements": {
+        "plr": {
+            "ext-wall": {
+                "linear": 6.1e-08,
+                "coefficient": 0.0005,
+                "exponent": 0.65
+            },
+            "ext-wall-03": {
+                "linear": 5.49e-07,
+                "coefficient": 0.0045,
+                "exponent": 0.65
+            },
+            "ext-wall-07": {
+                "linear": 1.281e-06,
+                "coefficient": 0.0105,
+                "exponent": 0.65
+            },
+            "ext-wall-08": {
+                "linear": 1.464e-06,
+                "coefficient": 0.012,
+                "exponent": 0.65
+            },
+            "ext-wall-10": {
+                "linear": 1.83e-06,
+                "coefficient": 0.015,
+                "exponent": 0.65
+            },
+            "ext-wall-17": {
+                "linear": 3.111e-06,
+                "coefficient": 0.0255,
+                "exponent": 0.65
+            },
+            "int-wall": {
+                "linear": 1.5e-07,
+                "coefficient": 0.001,
+                "exponent": 0.65
+            },
+            "int-wall-03": {
+                "linear": 1.35e-06,
+                "coefficient": 0.009,
+                "exponent": 0.65
+            },
+            "int-wall-07": {
+                "linear": 3.15e-06,
+                "coefficient": 0.021,
+                "exponent": 0.65
+            },
+            "int-wall-10": {
+                "linear": 4.5e-06,
+                "coefficient": 0.03,
+                "exponent": 0.65
+            }
+        }
+    },
+    "links": {
+        "link-1": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "n-lib",
+            "height1": 0.0,
+            "element": "ext-wall-08"
+        },
+        "link-2": {
+            "node0": "office-2",
+            "height0": 0.0,
+            "node1": "n-off-2",
+            "height1": 0.0,
+            "element": "ext-wall-10"
+        },
+        "link-3": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "office-2",
+            "height1": 0.0,
+            "element": "int-wall-07"
+        },
+        "link-4": {
+            "node0": "office-2",
+            "height0": 0.0,
+            "node1": "e-off-2",
+            "height1": 0.0,
+            "element": "ext-wall-07"
+        },
+        "link-5": {
+            "node0": "hallway",
+            "height0": 0.0,
+            "node1": "office-2",
+            "height1": 0.0,
+            "element": "int-wall-03"
+        },
+        "link-6": {
+            "node0": "office-1",
+            "height0": 0.0,
+            "node1": "office-2",
+            "height1": 0.0,
+            "element": "int-wall-07"
+        },
+        "link-7": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "w-lib",
+            "height1": 0.0,
+            "element": "ext-wall-17"
+        },
+        "link-8": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "hallway",
+            "height1": 0.0,
+            "element": "int-wall-10"
+        },
+        "link-9": {
+            "node0": "hallway",
+            "height0": 0.0,
+            "node1": "office-1",
+            "height1": 0.0,
+            "element": "int-wall-10"
+        },
+        "link-10": {
+            "node0": "office-1",
+            "height0": 0.0,
+            "node1": "e-off-1",
+            "height1": 0.0,
+            "element": "ext-wall-10"
+        },
+        "link-11": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "s-lib",
+            "height1": 0.0,
+            "element": "ext-wall-08"
+        },
+        "link-12": {
+            "node0": "hallway",
+            "height0": 0.0,
+            "node1": "s-hall",
+            "height1": 0.0,
+            "element": "ext-wall-03"
+        },
+        "link-13": {
+            "node0": "office-1",
+            "height0": 0.0,
+            "node1": "s-off-1",
+            "height1": 0.0,
+            "element": "ext-wall-07"
+        }
+    }
+}

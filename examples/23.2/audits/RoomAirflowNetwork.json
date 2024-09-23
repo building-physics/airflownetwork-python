@@ -3,15 +3,15 @@
         "0": 10
     },
     "multizone_link_histogram": {
-        "7": 2,
-        "5": 2,
-        "14": 1,
-        "0": 5
+        "7": 4,
+        "20": 1,
+        "4": 2,
+        "6": 3
     },
     "max_multizone_links": {
         "zone": "NORTH_ZONE",
         "afn_zone": "NORTH_ZONE",
-        "count": 14
+        "count": 20
     },
     "external_link_histogram": {
         "3": 2,
@@ -26,7 +26,10 @@
     },
     "messages": [
         "1 zone(s) with greater than 8 external links",
-        "Intrazone data found, skipping connectedness tests"
+        "Multizone network is not fully connected",
+        "Network (multizone + distribution) is not fully connected"
     ],
-    "duplicate distribution nodes": false
+    "duplicate distribution nodes": false,
+    "multizone connected": false,
+    "connected": false
 }

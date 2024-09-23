@@ -1,0 +1,189 @@
+{
+    "title": "Simplified law office case",
+    "nodes": {
+        "office-1": {
+            "height": 0.0,
+            "temperature": 20.0
+        },
+        "office-2": {
+            "height": 0.0,
+            "temperature": 20.0
+        },
+        "library": {
+            "height": 0.0,
+            "temperature": 20.0
+        },
+        "hallway": {
+            "height": 0.0,
+            "temperature": 20.0
+        },
+        "n-lib": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 15.0
+        },
+        "n-off-2": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 15.0
+        },
+        "e-off-2": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 5.0
+        },
+        "e-off-1": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 5.0
+        },
+        "s-off-1": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": -15.0
+        },
+        "s-hall": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": -15.0
+        },
+        "s-lib": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": -15.0
+        },
+        "w-lib": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": -5.0
+        }
+    },
+    "elements": {
+        "plr": {
+            "ext-wall": {
+                "linear": 6.1e-08,
+                "coefficient": 0.0005,
+                "exponent": 0.65
+            },
+            "int-wall": {
+                "linear": 1.5e-07,
+                "coefficient": 0.001,
+                "exponent": 0.65
+            }
+        }
+    },
+    "links": {
+        "link-1": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "n-lib",
+            "height1": 0.0,
+            "element": "ext-wall",
+            "multiplier": 24.0
+        },
+        "link-2": {
+            "node0": "office-2",
+            "height0": 0.0,
+            "node1": "n-off-2",
+            "height1": 0.0,
+            "element": "ext-wall",
+            "multiplier": 30.0
+        },
+        "link-3": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "office-2",
+            "height1": 0.0,
+            "element": "int-wall",
+            "multiplier": 21.0
+        },
+        "link-4": {
+            "node0": "office-2",
+            "height0": 0.0,
+            "node1": "e-off-2",
+            "height1": 0.0,
+            "element": "ext-wall",
+            "multiplier": 21.0
+        },
+        "link-5": {
+            "node0": "hallway",
+            "height0": 0.0,
+            "node1": "office-2",
+            "height1": 0.0,
+            "element": "int-wall",
+            "multiplier": 9.0
+        },
+        "link-6": {
+            "node0": "office-1",
+            "height0": 0.0,
+            "node1": "office-2",
+            "height1": 0.0,
+            "element": "int-wall",
+            "multiplier": 21.0
+        },
+        "link-7": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "w-lib",
+            "height1": 0.0,
+            "element": "ext-wall",
+            "multiplier": 51.0
+        },
+        "link-8": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "hallway",
+            "height1": 0.0,
+            "element": "int-wall",
+            "multiplier": 30.0
+        },
+        "link-9": {
+            "node0": "hallway",
+            "height0": 0.0,
+            "node1": "office-1",
+            "height1": 0.0,
+            "element": "int-wall",
+            "multiplier": 30.0
+        },
+        "link-10": {
+            "node0": "office-1",
+            "height0": 0.0,
+            "node1": "e-off-1",
+            "height1": 0.0,
+            "element": "ext-wall",
+            "multiplier": 30.0
+        },
+        "link-11": {
+            "node0": "library",
+            "height0": 0.0,
+            "node1": "s-lib",
+            "height1": 0.0,
+            "element": "ext-wall",
+            "multiplier": 24.0
+        },
+        "link-12": {
+            "node0": "hallway",
+            "height0": 0.0,
+            "node1": "s-hall",
+            "height1": 0.0,
+            "element": "ext-wall",
+            "multiplier": 9.0
+        },
+        "link-13": {
+            "node0": "office-1",
+            "height0": 0.0,
+            "node1": "s-off-1",
+            "height1": 0.0,
+            "element": "ext-wall",
+            "multiplier": 21.0
+        }
+    }
+}
