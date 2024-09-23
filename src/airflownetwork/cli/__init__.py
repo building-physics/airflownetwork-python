@@ -8,25 +8,6 @@ from typing import TextIO
 
 from ..__about__ import __version__
 
-@click.command()
-@click.argument('epjson', type=click.Path(exists=True))
-@click.option('-j', '--json', is_flag=True, show_default=True, default=False, help='Write summary in JSON format.')
-#@click.option('-o', '--output', show_default=True, default=None, help='Write output to the specified file.')
-@click.option('-o', '--output', type=click.File('w'), show_default=True, default='-', help='File name to write.')
-def summarize(epjson, json, output):
-    try:
-        model = afn.load_epjson(epjson)
-    except Exception as exc:
-        click.echo('Failed to open epJSON file "%s": %s' % (epjson, str(exc)))
-        return
-    try:
-        auditor = afn.Auditor(model)
-    except Exception as exc:
-        click.echo('Failed to load model "%s": %s' % (epjson, str(exc)))
-        return
-    result = auditor.summarize_model(json_output=json)
-    output.write('\n'.join(result))
-
 class ModelContext:
     def __init__(self, model:afn.Model):
         self.model = model
@@ -39,7 +20,7 @@ class ModelContext:
         if not quiet:
             status=click.echo
         self.model.initialize()
-        self.model.air_movement(status_function=status)
+        self.model.airmov(status_function=status)
         afn.write_results_csv([el for el in self.model.nodes.values() if el.index is not None], self.model.links, output)
 
 class EpJsonContext:
@@ -60,6 +41,8 @@ class EpJsonContext:
                 json_module.dump(auditor.json, output)
         else:
             output.write('\n'.join(auditor.summarize()))
+    def simulation(self, output:TextIO, indent:int|None=None, no_distribution:bool=False):
+        click.echo('Simulation operation only supported for JSON models.')
     def graph(self, output:TextIO, no_distribution:bool=False):
         try:
             auditor = afn.Auditor(self.model, no_distribution=no_distribution)
@@ -68,8 +51,6 @@ class EpJsonContext:
             return
         # Generate the output and write it out
         auditor.write_dot(output)
-    def simulate(self, output:str, steady:bool=True, quiet:bool=False):
-        click.echo('Graph operation only supported for AFN models.')
 
 @click.command()
 @click.option('-o', '--output', type=click.Path(writable=True), show_default=True, default='afn.csv',
@@ -77,11 +58,11 @@ class EpJsonContext:
 @click.option('-q', '--quiet', is_flag=True, show_default=True, default=False, help='Write out status.')
 @click.option('-s', '--steady', is_flag=True, show_default=True, default=True, help='Solve the steady problem.')
 @click.pass_context
-def simulate(ctx: click.Context, output:TextIO, quiet:bool, steady:bool):
-    if ctx.obj is None:
-        click.echo('Nothing to simulate. Read in a model first')
+def simulate(ctx:click.Context, output:TextIO, quiet:bool, steady:bool):
+    if not ctx.obj:
+        click.echo('Nothing to simulate. Please read in a model first')
         return
-    ctx.obj.simulate(output, steady=steady, quiet=quiet)
+    ctx.obj[0].simulate(output, steady=steady, quiet=quiet)
 
 @click.command()
 @click.option('-j', '--json', is_flag=True, show_default=True, default=False, help='Write summary in JSON format.')
@@ -90,61 +71,48 @@ def simulate(ctx: click.Context, output:TextIO, quiet:bool, steady:bool):
 @click.option('--no-distribution', is_flag=True, show_default=True, default=False, help='Do not evaluate distribution, even if present.')
 @click.pass_context
 def audit(ctx:click.Context, json:bool, output:TextIO, indent:bool, no_distribution:bool):
-    if ctx.obj is None:
-        click.echo('Nothing to audit. Read in a model first')
+    if not ctx.obj:
+        click.echo('Nothing to audit. Please read in a model first')
         return
-    ctx.obj.audit(output, json_output=json, indent=indent, no_distribution=no_distribution)
+    ctx.obj[0].audit(output, json_output=json, indent=indent, no_distribution=no_distribution)
 
 @click.command()
 @click.argument('json', type=click.Path(exists=True))
 @click.option('-e', '--epjson', is_flag=True, show_default=True, default=False, help='Read input in the epJSON format.')
 @click.pass_context
-def read(ctx: click.Context, json:str, epjson:bool):
-    if epjson:
-        try:
-            model = afn.load_epjson(epjson)
-        except Exception as exc:
-            click.echo('Failed to open epJSON file "%s": %s' % (epjson, str(exc)))
-            return
-        ctx.obj = EpJsonContext(model)
-    else:
-        with open(json, 'r') as fp:
-            data = json_module.load(fp)
-            model = afn.Model.from_json(data)
-        ctx.obj = ModelContext(model)
-
-@click.command()
-@click.option('-o', '--output', type=click.File('w'), show_default=True, default='graph.dot',
-              help='File name to write the dot output.')
-@click.option('--no-distribution', is_flag=True, show_default=True, default=False, help='Do not evaluate distribution, even if present.')
-@click.pass_context
-def graph(ctx: click.Context, output:TextIO, no_distribution:bool):
-    if ctx.obj is None:
-        click.echo('Nothing to audit. Read in a model first')
-        return
-    ctx.obj.graph(output, no_distribution=no_distribution)
-
-@click.group(context_settings={'help_option_names': ['-h', '--help']}, invoke_without_command=True)
-@click.version_option(version=__version__, prog_name='airflownetwork')
-@click.argument('json', type=click.Path(exists=True))
-@click.option('-e', '--epjson', is_flag=True, show_default=True, default=False, help='Read input in the epJSON format.')
-@click.pass_context
-def airflownetwork(ctx: click.Context, json:str, epjson:bool):
-    ctx.obj = None
+def read(ctx:click.Context, json:str, epjson:bool):
+    ctx.obj.clear()
     if epjson:
         try:
             model = afn.load_epjson(json)
         except Exception as exc:
             click.echo('Failed to open epJSON file "%s": %s' % (json, str(exc)))
             return
-        ctx.obj = EpJsonContext(model)
+        ctx.obj.append(EpJsonContext(model))
     else:
         with open(json, 'r') as fp:
             data = json_module.load(fp)
             model = afn.Model.from_json(data)
-        ctx.obj = ModelContext(model)
+        ctx.obj.append(ModelContext(model))
 
-airflownetwork.add_command(summarize)
+@click.command()
+@click.option('-o', '--output', type=click.File('w'), show_default=True, default='graph.dot',
+              help='File name to write the dot output.')
+@click.option('--no-distribution', is_flag=True, show_default=True, default=False, help='Do not evaluate distribution, even if present.')
+@click.pass_context
+def graph(ctx:click.Context, output:TextIO, no_distribution:bool):
+    if not ctx.obj:
+        click.echo('Nothing to audit. Please read in a model first')
+        return
+    ctx.obj[0].graph(output, no_distribution=no_distribution)
+
+@click.group(context_settings={'help_option_names': ['-h', '--help']}, invoke_without_command=False, chain=True)
+@click.version_option(version=__version__, prog_name='airflownetwork')
+@click.pass_context
+def airflownetwork(ctx:click.Context):
+    ctx.obj = [] # We'll use a list for now, later we'll want to be able to load more than one model. But not right now.
+
+airflownetwork.add_command(read)
 airflownetwork.add_command(graph)
 airflownetwork.add_command(audit)
 airflownetwork.add_command(simulate)

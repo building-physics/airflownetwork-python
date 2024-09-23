@@ -4,9 +4,10 @@
 from __future__ import annotations # Remove when dropping 3.9
 import math
 import scipy
-import numpy
+import numpy as np
 from typing import Type
 from .powerlaw import PowerLaw, SqrtPowerLaw
+from .solver import Solver
 
 object_lookup = {"plr": PowerLaw, "sqrt_plr": SqrtPowerLaw}
 
@@ -69,7 +70,7 @@ class BadNetwork(Exception):
     """Raised if the network is bad."""
     pass
 
-class Model:
+class Model(Solver):
     """A class containing nodes, links, and other data representing a pressure network.
     """
     def __init__(self, nodes, elements, links, global_temperature:float=None, global_density:float=None):
@@ -118,11 +119,11 @@ class Model:
                     col.append(link.node0.index)
                     data.append(1.0)
 
-        matrix = scipy.sparse.coo_matrix((numpy.array(data, dtype=numpy.double),
-                                          (numpy.array(row), numpy.array(col))),
+        matrix = scipy.sparse.coo_matrix((np.array(data, dtype=np.double),
+                                          (np.array(row), np.array(col))),
                                           shape=(count, count))
         self.A = scipy.sparse.csr_matrix(matrix)
-        self.x = numpy.zeros([self.size, 1], dtype=numpy.double)
+        self.x = np.zeros([self.size, 1], dtype=np.double)
 
         self.set_properties(self.nodes.values(), global_temperature=global_temperature,
                             global_density=global_density)
@@ -272,140 +273,22 @@ class Model:
                     node.viscosity = 1.71432e-5 + 4.828E-8 * (node.temperature - 273.15)
                     node.dvisc = node.density / node.viscosity
 
-    def initialize(self, maxiter:int=100):
-        """Initialize the flow network.
-        
-        Compute flows and pressure drops using linear flow representation for all elements.
-        
-        Parameters
-        ----------
-        maxiter: optional
-            The maximum number of iterations allowed in the solution.
-            
-        Returns
-        -------
-        bool:
-            True is returned if the initialization has converged in the allowed number of iterations, False otherwise.
-        """
-        self.A.data.fill(0.0)
-        self.x.fill(0.0)
-        for link in self.links:
-            if link.node0.variable_pressure:
-                c = link.element.linearize(link)
-                # diagonal term
-                self.A[link.node0.index, link.node0.index] += c
-                if link.node1.variable_pressure:
-                    # diagonal term
-                    self.A[link.node1.index, link.node1.index] += c
-                    # off diagonal terms
-                    self.A[link.node0.index, link.node1.index] -= c
-                    self.A[link.node1.index, link.node0.index] -= c
-                else:
-                    self.x[link.node0.index] += c*link.node1.pressure
-        self.x, info = scipy.sparse.linalg.cg(self.A, self.x, maxiter=maxiter)
-        if info == 0:
-            # Update the nodal pressures
-            for node in self.variable_nodes:
-                node.pressure = self.x[node.index]
-            # Update the flows:
-            for link in self.links:
-                c = link.element.linearize(link)
-                link.flow0 = c*(link.node0.pressure-link.node1.pressure)
-                link.flow1 = 0.0
-            return True
-        return False
-    
-    def compute_pressure_drops(self):
-        """Compute the pressure drop across all the links in the model."""
-        for link in self.links:
-            # Stack contribution
-            sp0 = -9.80 * link.node0.density * link.ht0
-            sp1 =  9.80 * link.node1.density * link.ht1
-            dhx = (link.node0.height - link.node1.height) + (link.ht0 - link.ht1)
-            spx = 0.0
-            if dhx != 0.0:
-                if link.flow0 > 0.0:
-                    spx = 9.80 * link.node0.density * dhx
-                elif link.flow0 < 0.0:
-                    spx = 9.80 * link.node1.density * dhx
-                else:
-                    spx = 4.90 * (link.node0.dens + link.node1.dens) * dhx
-            # Wind pressure contribution goes here
-            link.pdrop =  sp0 + sp1 + spx
-
-    def air_movement(self, maxiter:int=100, max_subiter:int=100, tolerance:float=1.0e-8, status_function=None):
-        """Compute steady airflows in the model.
-        
-        Parameters
-        ----------
-        maxiter: optional
-            The maximum number of Newton iterations allowed.
-        max_subiter: optional
-            The maximum number of conjugate gradient iterations allowed in the linear solve.
-        tolerance: optional
-            The absolute convergence tolerance.
-        status_function: optional
-            Function that handles message output, the default is to discard all messages.
-        
-        Returns
-        -------
-        int:
-            The number of Newton iterations used in the solve.
-        """
-        if status_function is None:
-            status_function = devnull
-        self.compute_pressure_drops()
-        status_function('iter | Max Resid|\n==== ===============')
-        for iter in range(1,maxiter+1):
-            self.A.data.fill(0.0)
-            self.x.fill(0.0)
-            for link in self.links:
-                if link.node0.variable_pressure:
-                    pdrop = link.node0.pressure - link.node1.pressure + link.pdrop
-                    nf, link.flow0, link.flow1, df0, df1 = link.element.jacobian(link, pdrop)
-                    if nf == 1:
-                        # diagonal term
-                        self.A[link.node0.index, link.node0.index] += df0
-                        self.x[link.node0.index] += link.flow0
-                        if link.node1.variable_pressure:
-                            # diagonal term
-                            self.A[link.node1.index, link.node1.index] += df0
-                            self.x[link.node1.index] -= link.flow0
-                            # off diagonal terms
-                            self.A[link.node0.index, link.node1.index] -= df0
-                            self.A[link.node1.index, link.node0.index] -= df0
-                    else:
-                        raise NotImplementedError('Two-way flow is not yet implemented')
-            maxf = abs(max(self.x, key=abs))
-            
-            if abs(maxf) > tolerance:
-                status_function('%4d %15.9e' % (iter, maxf))
+    def stack_pressure_drop(self, link):
+        """Compute the stack pressure drop across all the links in the model."""
+        # Stack contribution
+        sp0 = -9.80 * link.node0.density * link.ht0
+        sp1 =  9.80 * link.node1.density * link.ht1
+        dhx = (link.node0.height - link.node1.height) + (link.ht0 - link.ht1)
+        spx = 0.0
+        if dhx != 0.0:
+            if link.flow0 > 0.0:
+                spx = 9.80 * link.node0.density * dhx
+            elif link.flow0 < 0.0:
+                spx = 9.80 * link.node1.density * dhx
             else:
-                status_function('%4d %15.9e < %e' % (iter, maxf, tolerance))
-                # Update the pressure drops, up until now only secondary terms present
-                for link in self.links:
-                    if link.node0.variable_pressure:
-                        link.pdrop += link.node0.pressure - link.node1.pressure
-                return iter
-            info = 0
-            self.x, info = scipy.sparse.linalg.cg(self.A, self.x, maxiter=max_subiter)
-            if info == 0:
-                # Update the nodal pressures, flows are set above
-                for node in self.variable_nodes:
-                    node.pressure -= self.x[node.index]
-            else:
-                raise RuntimeError('Newton iteration solve failed at %d iterations' % iter)
-        return maxiter
+                spx = 4.90 * (link.node0.dens + link.node1.dens) * dhx
+        return  sp0 + sp1 + spx
 
-def write_results_csv(nodes, links, csv_file_name: str)   :
-    fp = open(csv_file_name, 'w')
-    fp.write('node header, name, time id, pressure, temperature, density\n')
-    for node in nodes:
-        fp.write('node, %s, 0, %21.15e, %21.15e, %21.15e\n' % (node.name, node.pressure,
-                                                               node.temperature, node.density))
-    fp.write('link header, name, time id, pressure drop, flow0, flow1\n')
-    for link in links:
-        if link.flipped:
-            raise 'STOPSTOPSTOP'
-        fp.write('link, %s, 0, %21.15e, %21.15e, %21.15e\n' % (link.name, link.pdrop, link.flow0, link.flow1))
-    fp.close()
+    def check_convergence(self, solution, tolerance):
+        maxf = max(solution.min(), solution.max(), key=abs)
+        return maxf, abs(maxf) <= tolerance

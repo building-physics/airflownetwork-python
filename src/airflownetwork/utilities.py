@@ -87,3 +87,16 @@ def compare_csvs(csv1:str, csv2:str, node_pressure_tolerance:float=1.0e-7, node_
                     messages.append('Unknown row type: %s' % line1[0])
             line_count += 1
     return messages
+
+def write_results_csv(nodes, links, csv_file_name: str)   :
+    fp = open(csv_file_name, 'w')
+    fp.write('node header, name, time id, pressure, temperature, density\n')
+    for node in nodes:
+        fp.write('node, %s, 0, %21.15e, %21.15e, %21.15e\n' % (node.name, node.pressure,
+                                                               node.temperature, node.density))
+    fp.write('link header, name, time id, pressure drop, flow0, flow1\n')
+    for link in links:
+        if link.flipped:
+            raise 'STOPSTOPSTOP'
+        fp.write('link, %s, 0, %21.15e, %21.15e, %21.15e\n' % (link.name, link.pdrop, link.flow0, link.flow1))
+    fp.close()

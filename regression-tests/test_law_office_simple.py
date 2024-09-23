@@ -17,7 +17,7 @@ def test_law_office_simple():
         assert data is not None
         model = afn.Model.from_json(data, global_density=1.2040973677927915)
         model.initialize()
-        model.air_movement(status_function=print)
+        model.airmov(status_function=print)
         afn.write_results_csv([el for el in model.nodes.values() if el.index is not None], model.links, 'afn.csv')
         assert os.path.exists('afn.csv')
         assert afn.compare_csvs(contam_csv, 'afn.csv', node_density_tolerance=1.0e-8, node_temperature_tolerance=1.0e-5,
