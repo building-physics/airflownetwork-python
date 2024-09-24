@@ -53,6 +53,54 @@ class EpJsonContext:
         auditor.write_dot(output)
 
 @click.command()
+@click.option('-o', '--output', type=click.Path(writable=True), show_default=True, default=None,
+              help='File to store output in.')
+@click.option('-q', '--quiet', is_flag=True, show_default=True, default=False, help='Write out status.')
+@click.option('-r', '--remove-objects', is_flag=True, show_default=True, default=False, help='Remove incompatible objects.')
+@click.option('-i', '--indent', type=click.IntRange(min=0), show_default=True, default=0,
+              help='Output pretty JSON with the specified indent')
+@click.option('-s', '--strip', is_flag=True, show_default=True, default=False, help='Strip out extra data.')
+@click.option('-w', '--window-filter', multiple=True, default=[], help='Filter(s) to select windows.')
+@click.option('-d', '--door-filter', multiple=True, default=[], help='Filter(s) to select doors.')
+@click.option('--no-openings', is_flag=True, show_default=True, default=False, help='Do not add window or door elements.')
+@click.option('--no-windows', is_flag=True, show_default=True, default=False, help='Do not add window elements.')
+@click.option('--no-doors', is_flag=True, show_default=True, default=False, help='Do not add door elements.')
+@click.option('--windows-may-be-doors', is_flag=True, show_default=True, default=False,
+              help='Doors may be represented as windows in the model.')
+@click.option('--no-envelope', is_flag=True, show_default=True, default=False, help='Do not add average envelope elements.')
+@click.option('--supported-surfaces', is_flag=True, show_default=True, default=False,
+              help='Print out supported/unsupported surfaces and exit.')
+@click.option('-a', '--aggregate-leakage', is_flag=True, show_default=True, default=False,
+              help='Where possible, aggregate leakage paths to reduce matrix size.')
+@click.pass_context
+def generate(ctx:click.Context, output:TextIO, quiet:bool, remove_objects:bool, indent:int, strip:bool,
+             window_filter, door_filter, no_openings:bool, no_windows:bool, no_doors:bool, windows_may_be_doors:bool,
+             no_envelope:bool, supported_surfaces:bool, aggregate_leakage:bool):
+    if not ctx.obj:
+        click.echo('Nothing to simulate. Please read in a model first')
+        return
+    if supported_surfaces:
+        pass
+    epjson_model = ctx.obj[0].model
+    model = afn.build_network(epjson_model, quiet=quiet, delete_objects=remove_objects, strip=strip,
+                              window_filters=window_filter, door_filters=door_filter, no_openings=no_openings,
+                              no_windows=no_windows, no_doors=no_doors, no_envelope=no_envelope,
+                              aggregate_leakage=aggregate_leakage)
+    if output is not None:
+        if not quiet:
+            click.echo('Writing output file %s... ' % output)
+        fp = open(output, 'w')
+        if indent != 0:
+            json_module.dump(model, fp, indent=indent)
+        else:
+            json_module.dump(model, fp)
+        fp.close()
+        if not quiet:
+            click.echo('Done.')
+    # Probably not needed
+    ctx.obj[0] = model
+
+@click.command()
 @click.option('-o', '--output', type=click.Path(writable=True), show_default=True, default='afn.csv',
               help='File name for results output.')
 @click.option('-q', '--quiet', is_flag=True, show_default=True, default=False, help='Write out status.')
