@@ -6,7 +6,15 @@ import sys
 import math
 import re
 
+from .bnd import BranchNodeDetails, NodeConnect
+
 class UnexpectedInput(Exception):
+    pass
+
+class BranchNodeDetailsFailure(Exception):
+    pass
+
+class UnsupportedObject(Exception):
     pass
 
 class JsonObject:
@@ -41,6 +49,41 @@ class Crack(JsonObject):
         self.name = name
         self.air_mass_flow_coefficient_at_reference_conditions = coef
         self.air_mass_flow_exponent = expo
+
+class DistributionNode(JsonObject):
+    def __init__(self, name=None, component_name_or_node_name=None,
+                 component_object_type_or_node_type=None, node_height=3.0):
+        self.name = name
+        self.component_name_or_node_name = component_name_or_node_name
+        self.component_object_type_or_node_type = component_object_type_or_node_type
+        self.node_height = node_height
+
+class Linkage(JsonObject):
+    def __init__(self, name=None, component_name=None, node_1_name=None, node_2_name=None,
+                 thermal_zone_name=None):
+        self.name = name
+        self.component_name = component_name
+        self.node_1_name = node_1_name
+        self.node_2_name = node_2_name
+        self.thermal_zone_name = thermal_zone_name
+
+class ObjectNode(JsonObject):
+    def __init__(self, name=None, type=None):
+        self.name = name
+        self.component_object_type_or_node_type = type
+
+class RegularNode(JsonObject):
+    def __init__(self, name=None, component_name_or_node_name=None):
+        self.name = name
+        self.component_name_or_node_name = component_name_or_node_name
+        self.component_object_type_or_node_type = 'Other'
+
+class DistributionLinkage(JsonObject):
+    def __init__(self, name=None, component_name=None, node_1_name=None, node_2_name=None):
+        self.name = name
+        self.component_name = component_name
+        self.node_1_name = node_1_name
+        self.node_2_name = node_2_name
 
 def repair_fenestration_surface_detailed(json_object):
     """Rework a fenestration surfaces's vertices."""
@@ -134,7 +177,6 @@ def polygon_area_yz(verts):
     result = result + v.y * (v_next.z - v_last.z)
     return 0.5 * result
 
-
 def detailed_area(json_object):
     # Should better check that this is at least a triangle
     #assert len(json_object['vertices']) >= 3, ('Detailed surface only has %d vertices' % len(json_object['vertices']))
@@ -162,10 +204,8 @@ def detailed_area(json_object):
         area = polygon_area_xy(vertices)/normal.z
     return area, normal
 
-
 def tilt_to_elevation(tilt):
     return 90.0 - tilt
-
 
 def simple_normal(json_object):
     # The Azimuth Angle indicates the direction that the wall faces (outward normal).
@@ -187,7 +227,6 @@ def simple_normal(json_object):
                           math.sin(elevation))
     return normal
 
-
 class Surface(JsonObject):
     def __init__(self, name=None, surface_name=None, component_name=None, zone=None,
                  external_node=None, area=None, json=None, other=None, normal=None,
@@ -207,6 +246,7 @@ class Surface(JsonObject):
         self.other = other
         if other is not None:
             other.other = self
+
     def to_json(self):
         return {'surface_name': self.surface_name,
                 'leakage_component_name': self.component_name,
@@ -221,6 +261,7 @@ class Surface(JsonObject):
         normal = simple_normal(object_data)
         return cls(surface_name=surface_name, area=area, zone=zone_name,
                    json=object_data, normal=normal)
+    
     @classmethod
     def from_partition(cls, model, object_type, object_name, object_data, surfaces):
         surface_name = object_name
@@ -242,6 +283,7 @@ class Surface(JsonObject):
                                 json=other_data)
         return cls(surface_name=surface_name, area=area, zone=zone_name,
                    json=object_data, other=other_surface, normal=normal)
+    
     @classmethod
     def from_detailed(cls, model, object_type, object_name, object_data, surfaces):
         surface_name = object_name
@@ -262,6 +304,7 @@ class Surface(JsonObject):
                                 json=other_data)
         return cls(surface_name=surface_name, area=area, zone=zone_name,
                    json=object_data, other=other_surface, normal=normal)
+    
     @classmethod
     def from_detailed_fenestration(cls, model, object_type, object_name, object_data,
                                    surfaces):
@@ -360,7 +403,7 @@ opening_surface_handler = {'Window': Surface.from_envelope,
 
 surface_handler = opaque_surface_handler | opening_surface_handler
 
-def check_for_support():
+def check_supported_surfaces():
     objects = (window_objects + door_objects + simple_window_objects
                + simple_door_objects + fenestration_objects + simple_wall_objects
                + simple_envelope_objects + simple_partition_objects + simple_roofceiling_objects
@@ -368,7 +411,7 @@ def check_for_support():
                + detailed_wall_objects + detailed_roofceiling_objects + detailed_floor_objects)
     for name in set(objects):
         if name not in surface_handler:
-            print(' - ' + name + ' is not currently supported')
+            print('- ' + name + ' is not currently supported')
         else:
             print('+ ' + name + ' is supported')
 
@@ -428,6 +471,123 @@ def filter_other_objects(matchers, objects):
         else:
             toss.append(obj)
     return keep, toss
+
+class ZoneConnect:
+    def __init__(self, inlet=None, node=None, outlet=None):
+        self.inlet = inlet
+        self.node = node
+        self.outlet = outlet
+    def valid(self):
+        return self.inlet is not None and self.node is not None and self.outlet is not None
+
+class ComponentConnect:
+    def __init__(self, inlet=None, outlet=None):
+        self.inlet = inlet
+        self.outlet = outlet
+    def valid(self):
+        return self.inlet is not None and self.outlet is not None
+    def to_linkage(self):
+        pass
+
+class SplitterConnect:
+    def __init__(self, inlet=None, outlet=None):
+        self.inlet = inlet
+        self.outlets = []
+        if outlet is not None:
+            self.outlets = [outlet]
+    def valid(self):
+        return self.inlet is not None and self.outlet is not None
+    @property
+    def outlet(self):
+        if not self.outlets:
+            return None
+        return self.outlets[0]
+    @outlet.setter
+    def outlet(self, outlet):
+        self.outlets.append(outlet)
+    def to_linkage(self):
+        pass
+
+class MixerConnect:
+    def __init__(self, inlet=None, outlet=None):
+        self.inlets = []
+        if inlet is not None:
+            self.inlets = [inlet]
+        self.outlet = outlet
+    def valid(self):
+        return self.inlet is not None and self.outlet is not None
+    @property
+    def inlet(self):
+        if not self.inlets:
+            return None
+        return self.inlets[0]
+    @inlet.setter
+    def inlet(self, inlet):
+        self.inlets.append(inlet)
+    def to_linkage(self):
+        pass
+
+equivalent_lookup = {
+    'AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT': 'AirflowNetwork:Distribution:Component:TerminalUnit',
+    'AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT': 'AirflowNetwork:Distribution:Component:Duct',
+    'AIRTERMINAL:SINGLEDUCT:VAV:REHEAT': 'AirflowNetwork:Distribution:Component:TerminalUnit',
+    'AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT': 'AirflowNetwork:Distribution:Component:Duct',
+    'HEATEXCHANGER:AIRTOAIR:FLATPLATE': 'AirflowNetwork:Distribution:Component:HeatExchanger',
+    'HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT': 'AirflowNetwork:Distribution:Component:HeatExchanger',
+    'HEATEXCHANGER:DESICCANT:BALANCEDFLOW': 'AirflowNetwork:Distribution:Component:HeatExchanger',
+    'COIL:COOLING:DX': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:COOLING:DX:SINGLESPEED': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:COOLING:DX:TWOSPEED': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:HEATING:FUEL': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:HEATING:ELECTRIC': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:HEATING:DX:SINGLESPEED': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:COOLING:WATER': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:HEATING:WATER': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:COOLING:WATER:DETAILEDGEOMETRY': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:COOLING:DX:MULTISPEED': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:HEATING:DX:MULTISPEED': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:HEATING:DESUPERHEATER': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:HEATING:ELECTRIC:MULTISTAGE': 'AirflowNetwork:Distribution:Component:Coil',
+    'COIL:HEATING:GAS:MULTISTAGE': 'AirflowNetwork:Distribution:Component:Coil',
+    'FAN:CONSTANTVOLUME': 'AirflowNetwork:Distribution:Component:Fan',
+    'FAN:ONOFF': 'AirflowNetwork:Distribution:Component:Fan',
+    'FAN:VARIABLEVOLUME': 'AirflowNetwork:Distribution:Component:Fan',
+    'FAN:SYSTEMMODEL': 'AirflowNetwork:Distribution:Component:Fan'
+    }
+
+def default_fan(object_name=None, object_type=None):
+    return {'fan_name': object_name,
+            'supply_fan_object_type': object_type}
+
+def default_coil(object_name=None, object_type=None, length=0.1, hydraulic_diameter=0.5):
+    return {'coil_name': object_name,
+            'coil_object_type': object_type,
+            'air_path_length': length,
+            'air_path_hydraulic_diameter': hydraulic_diameter}
+
+def default_hx(object_name=None, object_type=None, length=0.1, hydraulic_diameter=0.5):
+    return {'heatexchanger_name': object_name,
+            'heatexchanger_object_type': object_type,
+            'air_path_length': length,
+            'air_path_hydraulic_diameter': hydraulic_diameter}
+
+def default_tu(object_name=None, object_type=None, length=0.1, hydraulic_diameter=0.5):
+    return {'terminal_unit_name': object_name,
+            'terminal_unit_object_type': object_type,
+            'air_path_length': length,
+            'air_path_hydraulic_diameter': hydraulic_diameter}
+
+def default_duct(object_name=None, object_type=None, length=0.1, hydraulic_diameter=0.5, cross_section_area=0.25):
+    return {'duct_length': length,
+            'hydraulic_diameter': hydraulic_diameter,
+            'cross_section_area': cross_section_area}
+
+equivalent_handler = {'AirflowNetwork:Distribution:Component:Fan': default_fan,
+                      'AirflowNetwork:Distribution:Component:Coil': default_coil,
+                      'AirflowNetwork:Distribution:Component:HeatExchanger': default_hx,
+                      'AirflowNetwork:Distribution:Component:TerminalUnit': default_tu,
+                      'AirflowNetwork:Distribution:Component:Duct': default_duct}
 
 class NetworkBuilder:
     def __init__(self, model, **kwargs):
@@ -745,10 +905,229 @@ class NetworkBuilder:
         string += '      Envelope doors: %d\n' % len(self.envelope_doors)
         string += '     Interzone doors: %d\n' % len(self.interzone_doors)
         return string
+    
+    def build_distribution(self, bnd):
+        zone_connects={}
+        component_connects={}
+        oasys_connects={}
+        zonesplitter_connects={}
+        zonemixer_connects={}
+        for c in bnd.node_connections:
+            if c.is_parent:
+                continue
+            # Sort out the connections into the sets that we need
+            print(c.connection_type)
+            # Use case for this when it's supported by all the live versions of Python
+            if c.connection_type is NodeConnect.ZoneInlet:
+                if c.object_name in zone_connects:
+                    zone_connects[c.object_name].inlet = c
+                else:
+                    zone_connects[c.object_name] = ZoneConnect(inlet=c)
+            elif c.connection_type is NodeConnect.ZoneNode:
+                if c.object_name in zone_connects:
+                    zone_connects[c.object_name].node = c
+                else:
+                    zone_connects[c.object_name] = ZoneConnect(node=c)
+            elif c.connection_type is NodeConnect.ZoneReturn:
+                if c.object_name in zone_connects:
+                    zone_connects[c.object_name].outlet = c
+                else:
+                    zone_connects[c.object_name] = ZoneConnect(outlet=c)
+            elif c.connection_type is NodeConnect.Inlet:
+                target = component_connects
+                obj = ComponentConnect
+                if c.object_type == 'OUTDOORAIR:MIXER':
+                    target = oasys_connects
+                elif c.object_type == 'AIRLOOPHVAC:ZONEMIXER':
+                    target = zonemixer_connects
+                    obj = MixerConnect
+                elif c.object_type == 'AIRLOOPHVAC:ZONESPLITTER':
+                    target = zonesplitter_connects
+                    obj = SplitterConnect
+                if c.object_name in target:
+                    target[c.object_name].inlet = c
+                else:
+                    target[c.object_name] = obj(inlet=c)
+            elif c.connection_type is NodeConnect.Outlet:
+                target = component_connects
+                obj = ComponentConnect
+                if c.object_type == 'OUTDOORAIR:MIXER':
+                    target = oasys_connects
+                elif c.object_type == 'AIRLOOPHVAC:ZONEMIXER':
+                    target = zonemixer_connects
+                    obj = MixerConnect
+                elif c.object_type == 'AIRLOOPHVAC:ZONESPLITTER':
+                    target = zonesplitter_connects
+                    obj = SplitterConnect
+                if c.object_name in target:
+                    target[c.object_name].outlet = c
+                else:
+                    target[c.object_name] = obj(outlet=c)
+        # Check that it has all worked oit
+        for el in list(zone_connects.values()) + list(component_connects.values()) + list(oasys_connects.values()):
+            if not el.valid():
+                raise BranchNodeDetailsFailure('Failed to correctly parse BND file.')
+            
+        regular_node_list = []
+        link_list = []
+        regular_elements = {
+            "AirflowNetwork:Distribution:Component:TerminalUnit": {},
+            "AirflowNetwork:Distribution:Component:HeatExchanger": {},
+            "AirflowNetwork:Distribution:Component:Coil": {},
+            "AirflowNetwork:Distribution:Component:Fan": {},
+            "AirflowNetwork:Distribution:Component:Duct": {}
+        }
+        # Handle the regular compoents
+        for name, comp in component_connects.items():
+            assert comp.inlet.object_type == comp.outlet.object_type
+            try:
+                obj = equivalent_lookup[comp.inlet.object_type]
+            except KeyError:
+                raise UnsupportedObject('Encountered unsupported object "%s"' % comp.inlet.object_type)
+            print(name.title()+' AFN Link')
+            element_name = name.title() + ' AFN Equivalent'
+            regular_elements[obj][element_name] = equivalent_handler[obj](object_name=name, object_type=comp.inlet.object_type)
+            regular_node_list.append(comp.inlet.node.name)
+            regular_node_list.append(comp.outlet.node.name)
+            link_list.append(DistributionLinkage(name=name, component_name=element_name,
+                                                node_1_name=comp.inlet.node.name.title() + ' AFN Node',
+                                                node_2_name=comp.outlet.node.name.title() + ' AFN Node'))
+
+        # Handle splitters
+        splitter_nodes = {} # There should be one of these per air loop, I hope
+        splitter_ducts = {}
+        splitter_links = []
+        for name, comp in zonesplitter_connects.items():
+            assert comp.inlet.object_type == comp.outlet.object_type
+            # Figure out which air loop we are on
+            try:
+                path_component = bnd.supply_air_path_components[name]
+            except KeyError:
+                raise BranchNodeDetailsFailure('Failed to find splitter path component')
+            print(path_component.airloophvac_name)
+            if path_component.airloophvac_name in splitter_nodes:
+                raise BranchNodeDetailsFailure('Encountered mulitiple splitters')
+            splitter_node_name = name.title() + ' AFN Splitter Node'
+            splitter_nodes[path_component.airloophvac_name] = ObjectNode(name=splitter_node_name,
+                                                                        type="AirLoopHVAC:ZoneSplitter")
+            element_name = element_name = name.title() + ' AFN Mixer Duct'
+            splitter_ducts[element_name] = default_duct()
+            splitter_links.append(DistributionLinkage(name=name.title() + ' AFN Splitter Link', 
+                                                    component_name=element_name,
+                                                    node_1_name=comp.inlet.node.name.title() + ' AFN Node', 
+                                                    node_2_name=splitter_node_name))
+            for outlet in comp.outlets:
+                element_name = outlet.node.name.title() + ' AFN Splitter Duct'
+                splitter_ducts[element_name] = default_duct()
+                splitter_links.append(DistributionLinkage(name = outlet.node.name.title() + ' AFN Splitter Link',
+                                                        component_name=element_name,
+                                                        node_1_name=splitter_node_name,
+                                                        node_2_name=outlet.node.name.title() + ' AFN Splitter Node'))
+
+        # Handle mixers
+        mixer_nodes = {} # There should be one of these per air loop, I hope
+        mixer_ducts = {}
+        mixer_links = []
+        for name, comp in zonemixer_connects.items():
+            assert comp.inlet.object_type == comp.outlet.object_type
+            # Figure out which air loop we are on
+            try:
+                path_component = bnd.return_air_path_components[name]
+            except KeyError:
+                raise BranchNodeDetailsFailure('Failed to find mixer path component')
+            print(path_component.airloophvac_name)
+            if path_component.airloophvac_name in mixer_nodes:
+                raise BranchNodeDetailsFailure('Encountered mulitiple mixers')
+            mixer_node_name = name.title() + ' AFN Mixer Node'
+            mixer_nodes[path_component.airloophvac_name] = ObjectNode(name=mixer_node_name,
+                                                                    type="AirLoopHVAC:ZoneMixer")
+            for inlet in comp.inlets:
+                element_name = inlet.node.name.title() + ' AFN Mixer Duct'
+                mixer_ducts[element_name] = default_duct()
+                mixer_links.append(DistributionLinkage(name=inlet.node.name.title() + ' AFN Mixer Link', 
+                                                    component_name=element_name,
+                                                    node_1_name=inlet.node.name.title() + ' AFN Node',
+                                                    node_2_name=mixer_node_name))
+            element_name = name.title() + ' AFN Mixer Duct'
+            mixer_ducts[element_name] = default_duct()
+            mixer_links.append(DistributionLinkage(name=name.title() + ' AFN Mixer Link',
+                                                component_name=element_name, 
+                                                node_1_name=mixer_node_name,
+                                                node_2_name=comp.outlet.node.name.title() + ' AFN Node'))
+
+        # Handle the zone connections
+        zone_links = []
+        zone_ducts = {}
+        zones = []
+        for name, con in zone_connects.items():
+            # name should be the zone name here
+            assert con.inlet.object_type == con.outlet.object_type
+            print(con.inlet.object_type, con.inlet.object_name, name)
+            zones.append(name)
+            element_name = name.title() + ' AFN Supply Duct'
+            zone_ducts[element_name] = default_duct()
+            zone_links.append(DistributionLinkage(name=name.title() + ' AFN Supply Link', 
+                                                component_name=element_name,
+                                                node_1_name=con.inlet.node.name.title() + ' AFN Node', 
+                                                node_2_name=name))
+            element_name = name.title() + ' AFN Return Duct'
+            zone_ducts[element_name] = default_duct()
+            zone_links.append(DistributionLinkage(name=name.title() + ' AFN Return Link', 
+                                                component_name=element_name,
+                                                node_1_name=name,
+                                                node_2_name=con.outlet.node.name.title() + ' AFN Node'))
+
+        # Handle OA systems
+        oa_links = []
+        oa_nodes = []
+        oa_ducts = {}
+        for name, con in oasys_connects.items():
+            # Create a system node
+            system_node_name = name.title() + ' AFN OA System Node'
+            oa_nodes.append(ObjectNode(system_node_name, 'AirLoopHVAC:OutdoorAirSystem'))
+            # Create the inlet link
+            element_name = name.title() + ' AFN OA Inlet Duct'
+            link_name =  name.title() + ' AFN OA Inlet'
+            oa_ducts[element_name] = default_duct()
+            oa_links.append(DistributionLinkage(name=link_name, component_name=element_name,
+                                                node_1_name=con.inlet.node.name, node_2_name=system_node_name))
+            # Create the outlet link
+            element_name = name.title() + ' AFN OA Outlet Duct'
+            link_name =  name.title() + ' AFN OA Outlet'
+            oa_ducts[element_name] = default_duct()
+            oa_links.append(DistributionLinkage(name=link_name, component_name=element_name,
+                                                node_1_name=system_node_name, node_2_name=con.outlet.node.name))
+
+        regular_node_list = list(set(regular_node_list))
+        regular_node_list = [RegularNode(el.title() + ' AFN Node', el) for el in regular_node_list]
+
+        # Add objects to the model, nodes first
+        if 'AirflowNetwork:Distribution:Node' not in self.model:
+            self.model['AirflowNetwork:Distribution:Node'] = {}
+        for el in regular_node_list + list(splitter_nodes.values()) + list(mixer_nodes.values()) + oa_nodes:
+            self.model['AirflowNetwork:Distribution:Node'][el.name] = el.to_json()
+
+        # Now add the new elements
+        regular_elements['AirflowNetwork:Distribution:Component:Duct'] = {**regular_elements['AirflowNetwork:Distribution:Component:Duct'],
+                                                                          **splitter_ducts, **mixer_ducts, **zone_ducts, **oa_ducts}
+        for k, v in regular_elements.items():
+            if v:
+                if k in self.model:
+                    self.model[k] = {**self.model[k], **v}
+                else:
+                    self.model[k] = v
+    
+        # Now for the links
+        if 'AirflowNetwork:Distribution:Linkage' not in self.model:
+            self.model['AirflowNetwork:Distribution:Linkage'] = {}
+        for el in link_list + splitter_links + mixer_links + zone_links + oa_links:
+            self.model['AirflowNetwork:Distribution:Linkage'][el.name] = el.to_json()
+        # zones
 
 def build_network(model, quiet:bool=False, delete_objects:bool=False, strip:bool=False,
                   window_filters=None, door_filters=None, no_openings:bool=False, no_windows:bool=False,
-                  no_doors:bool=False, no_envelope:bool=False, aggregate_leakage:bool=False):
+                  no_doors:bool=False, no_envelope:bool=False, aggregate_leakage:bool=False, 
+                  bnd:BranchNodeDetails|None=None):
 
     global start_message
     global message
@@ -776,6 +1155,9 @@ def build_network(model, quiet:bool=False, delete_objects:bool=False, strip:bool
 
     builder.process_surfaces()
     builder.create_network()
+
+    if bnd is not None:
+        builder.build_distribution(bnd)
 
     message(builder.surface_stats())
     return model
