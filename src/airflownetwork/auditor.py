@@ -1,66 +1,14 @@
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
-# of Illinois, The Regents of the University of California, through Lawrence
-# Berkeley National Laboratory (subject to receipt of any required approvals
-# from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
-# Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All
-# rights reserved.
+# SPDX-FileCopyrightText: 2022-present Oak Ridge National Laboratory, managed by UT-Battelle
 #
-# NOTICE: This Software was developed under funding from the U.S. Department of
-# Energy and the U.S. Government consequently retains certain rights. As such,
-# the U.S. Government has been granted for itself and others acting on its
-# behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
-# Software to reproduce, distribute copies to the public, prepare derivative
-# works, and perform publicly and display publicly, and to permit others to do
-# so.
+# SPDX-License-Identifier: BSD-3-Clause
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# (1) Redistributions of source code must retain the above copyright notice,
-#     this list of conditions and the following disclaimer.
-#
-# (2) Redistributions in binary form must reproduce the above copyright notice,
-#     this list of conditions and the following disclaimer in the documentation
-#     and/or other materials provided with the distribution.
-#
-# (3) Neither the name of the University of California, Lawrence Berkeley
-#     National Laboratory, the University of Illinois, U.S. Dept. of Energy nor
-#     the names of its contributors may be used to endorse or promote products
-#     derived from this software without specific prior written permission.
-#
-# (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in
-#     stand-alone form without changes from the version obtained under this
-#     License, or (ii) Licensee makes a reference solely to the software
-#     portion of its product, Licensee must refer to the software as
-#     "EnergyPlus version X" software, where "X" is the version number Licensee
-#     obtained under this License and may not use a different name for the
-#     software. Except as specifically required in this Section (4), Licensee
-#     shall not use in a company name, a product name, in advertising,
-#     publicity, or other promotional activities any name, trade name,
-#     trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or
-#     confusingly similar designation, without the U.S. Department of Energy's
-#     prior written consent.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
 
 import json
 import uuid
 from .tables import all_surfaces
 
-
 class BadModel(Exception):
     pass
-
 
 class BaseAuditor:
     def __init__(self, model):
@@ -76,7 +24,6 @@ class BaseAuditor:
         else:
             self.json['messages'] = [mesg]
 
-
 def connectedness(dictionary, start):
     connected_to = set()
     current_list = dictionary.pop(start)
@@ -86,15 +33,13 @@ def connectedness(dictionary, start):
             connected_to.add(name)
     return connected_to
 
-
 def load_epjson(file):
     with open(file, 'r') as fp:
         model = json.load(fp)
     return model
 
-
 class Auditor(BaseAuditor):
-    def __init__(self, model, no_distribution=False):
+    def __init__(self, model, distribution=False):
         super().__init__(model)
         self.internal_nodes = {}
         self.multizone_nodes = {}
@@ -109,7 +54,7 @@ class Auditor(BaseAuditor):
         self.afes = {}
         self.relative_geometry = False
         self.vertex_ccw = True
-        self.no_distribution = no_distribution
+        self.distribution = distribution
         # Figure out what is what
         if 'GlobalGeometryRules' in self.model:
             obj = next(iter(self.model['GlobalGeometryRules'].values()))
@@ -120,7 +65,7 @@ class Auditor(BaseAuditor):
                 self.vertex_ccw = False
         if self.__extract():
             if self.__connect_multizone():
-                if not self.no_distribution:
+                if self.distribution:
                     self.__connect_distribution()
 
     def __extract(self):
@@ -258,6 +203,13 @@ class Auditor(BaseAuditor):
                 '%s -- %s\n'
                 % (link['nodes'][0]['display_name'], link['nodes'][1]['display_name'])
             )
+        if self.distribution:
+            for name, link in self.distribution_links.items():
+                print(link)
+                fp.write(
+                    '%s -- %s\n'
+                    % (link['nodes'][0]['display_name'], link['nodes'][1]['display_name'])
+                )
         fp.write('}\n')
 
     def summarize(self):
@@ -521,13 +473,13 @@ class Auditor(BaseAuditor):
             # This is not a super great way to get this done, should reconsider
             if self.__extract():
                 if self.__connect_multizone():
-                    if not self.no_distribution:
+                    if self.distribution:
                         self.__connect_distribution()
         #
         # Now we've got the links worked out, so proceed to looking at what was there
         #
         node_dict = self.multizone_nodes
-        if not self.no_distribution:
+        if self.distribution:
             node_dict = self.internal_nodes
         link_histogram = {}
         external_link_histogram = {}
@@ -628,7 +580,7 @@ class Auditor(BaseAuditor):
         #
         # Check that distribution nodes are all pointing to different components
         #
-        if not self.no_distribution:
+        if self.distribution:
             duplicates = []
             used_components = {}
             for name, node in self.distribution_nodes.items():
@@ -661,7 +613,7 @@ class Auditor(BaseAuditor):
         #
         self.json['connected'] = self.json['multizone connected']
         # print(self.internal_nodes.keys())
-        if not self.no_distribution:
+        if self.distribution:
             neighbors = self.get_neighbors(no_distribution=False)
             starter = next(iter(neighbors.keys()))
             connectedness(neighbors, starter)
