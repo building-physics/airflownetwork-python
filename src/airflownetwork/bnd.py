@@ -921,11 +921,11 @@ class BranchNodeDetails:
             airloop.branch=[branch for branch in self.branches if branch.loop_name == airloop.name]
             
             """ assign airloop supply connections to airloops"""
-            airloop.supply_connections=[supply_connection for supply_connection  in self.airloop_connections if (supply_connection.airloophvac == airloop.name and supply_connection.is_supply==True)]
+            airloop.supply_connections=[supply_connection for supply_connection  in self.airloop_connections if (supply_connection.airloophvac == airloop.name and supply_connection.is_supply)]
             #airloop.
             
             """assign airloop retrun connections to airloops"""
-            airloop.return_connections=[supply_connection for supply_connection  in self.airloop_connections if (supply_connection.airloophvac == airloop.name and supply_connection.is_supply==False)]
+            airloop.return_connections=[supply_connection for supply_connection  in self.airloop_connections if (supply_connection.airloophvac == airloop.name and not supply_connection.is_supply)]
 
             """assign cooled zone and heated zone realted to airloop connection"""
             airloop.cooled_zone_names=[Zone.zone_name for Zone in self.cooled_zone_info if Zone.airloophvac==airloop.name]
