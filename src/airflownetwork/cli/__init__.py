@@ -111,8 +111,9 @@ def generate(ctx:click.Context, output:TextIO, quiet:bool, remove_objects:bool, 
               help='File name for results output.')
 @click.option('-q', '--quiet', is_flag=True, show_default=True, default=False, help='Write out status.')
 @click.option('-s', '--steady', is_flag=True, show_default=True, default=True, help='Solve the steady problem.')
+@click.option('-w', '--wth', type=click.File('r'), show_default=False, default=None, help='WTH file name to read.')
 @click.pass_context
-def simulate(ctx:click.Context, output:TextIO, quiet:bool, steady:bool):
+def simulate(ctx:click.Context, output:TextIO, quiet:bool, steady:bool, wth:TextIO|None):
     if not ctx.obj:
         click.echo('Nothing to simulate. Please read in a model first')
         return
