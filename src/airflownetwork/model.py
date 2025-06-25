@@ -8,11 +8,32 @@ import numpy as np
 from typing import Type
 from .powerlaw import PowerLaw, SqrtPowerLaw
 from .solver import Solver
+#from dataclasses import dataclass
 
 object_lookup = {"plr": PowerLaw, "sqrt_plr": SqrtPowerLaw}
 
 def devnull(msg: str):
     return
+
+class Angle:
+    def __init__(self, value:float, units:str):
+        self.value = value
+        self.units = units
+        self.radians = value
+        self.degrees = value
+        if units == 'degrees':
+            self.radians = value*(math.pi/180.0)
+        elif units == 'pi_multiplier':
+            self.radians = value * math.pi
+            self.degrees = value * 90.0
+        else: # units == 'radians'
+            self.degrees = value*(180.0/math.pi)
+    def __float__(self):
+        return self.radians
+
+
+def no_profile(angle:Angle):
+    return 0.0
 
 class Node:
     """A class representing a node in the pressure network.
@@ -33,9 +54,12 @@ class Node:
         The index of the node in the system of equations, only meaningful for variable nodes.
     input_c: optional
         Flag determining the input temperature units. If True, the temperature is in Celcius, otherwise Kelvin.
+    azimuth: Angle
+    volume: float
     """
     def __init__(self, name:str|None=None, variable_pressure:bool=True, height:float=0.0, temperature:float=293.15,
-                 pressure:float=0.0, index:int|None=None, input_c:bool=True, **kwargs):
+                 pressure:float=0.0, index:int|None=None, input_c:bool=True, azimuth:Angle|None=None,
+                 volume:float=math.inf, wind_pressure_profile=None, **kwargs):
         self.name = name
         self.variable_pressure = variable_pressure
         self.height = height
@@ -48,6 +72,21 @@ class Node:
         self.viscosity = 0.0
         self.sqrt_density = 0.0
         self.dvisc = 0.0 # Density divided by viscosity
+        self.azimuth = azimuth
+        if azimuth is None:
+            self.azimuth = Angle(math.inf, 'radians')
+        self.volume = volume
+        self.wind_pressure_profile = wind_pressure_profile
+        if wind_pressure_profile is None:
+            self.wind_pressure_profile = no_profile
+        self.added_pressure = 0
+    def compute_wind_pressure(self, wind_speed:float, wind_direction:Angle):
+        angle = wind_direction.degrees - self.azimuth.degrees
+        if angle < 0:
+            angle += 360.0
+        Cp = self.wind_pressure_profile(Angle(angle, 'degrees'))
+        self.added_pressure = Cp * 0.5 * self.density * wind_speed * wind_speed
+        return self.added_pressure
 
 class Link:
     def __init__(self, name=None, node0=None, height0=0.0, node1=None, height1=0.0, element=None,
@@ -88,12 +127,15 @@ class Model(Solver):
                     link.flipped = False
         # Figure out the size of the matrix
         self.variable_nodes = []
+        self.external_nodes = []
         count = 0
         for node in self.nodes.values():
             if node.variable_pressure:
                 node.index = count
                 count += 1
                 self.variable_nodes.append(node)
+            else:
+                self.external_nodes.append(node)
         #assert count == len(self.variable_nodes)
         self.size = count
         row = []
@@ -163,6 +205,11 @@ class Model(Solver):
         global_temperature = data.get('global_temperature', global_temperature)
         nodes = {}
         for name, node in data['nodes'].items():
+            if 'azimuth' in node:
+                if isinstance(node['azimuth'], dict):
+                    node['azimuth'] = Angle(**node['azimuth'])
+                else:
+                    node['azimuth'] = Angle(node['azimuth'], 'radians')
             nodes[name] = node_object(name=name, **node)
         elements = {}
         for name, el in data['elements']['plr'].items():

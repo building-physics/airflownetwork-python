@@ -24,9 +24,10 @@ classifiers = [
 ]
 dependencies = [
   "click",
-  "pandas",
   "numpy",
-  "scipy"
+  "scipy",
+  "matplotlib",
+  "pandas"
 ]
 dynamic = ["version"]
 
@@ -45,6 +46,7 @@ path = "src/airflownetwork/__about__.py"
 dependencies = [
   "pytest",
   "pytest-cov",
+  "scikit-learn"
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/airflownetwork --cov=tests {args}"

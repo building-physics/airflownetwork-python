@@ -1,4 +1,4 @@
-year,month,day,hour,dry_bulb, dew_point, relative_humidity, atmospheric_station_pressure, extraterrestrial_horizontal_radiation, extraterrestrial_direct_normal_radiation, horizontal_infrared_radiation_intensity, global_horizontal_radiation, direct_normal_radiation,diffuse_horizontal_radiation,global_horizontal_illuminance, direct_normal_illuminance, diffuse_horizontal_illuminance,zenith_luminance,wind_direction, wind_speed, total_sky_cover,opaque_sky_cover, visibility, ceiling_height, precipitable_water, aerosol_optical_depth
+year,month,day,hour,dry_bulb,dew_point,relative_humidity,atmospheric_station_pressure,extraterrestrial_horizontal_radiation,extraterrestrial_direct_normal_radiation,horizontal_infrared_radiation_intensity,global_horizontal_radiation,direct_normal_radiation,diffuse_horizontal_radiation,global_horizontal_illuminance,direct_normal_illuminance,diffuse_horizontal_illuminance,zenith_luminance,wind_direction,wind_speed,total_sky_cover,opaque_sky_cover,visibility,ceiling_height,precipitable_water,aerosol_optical_depth
 ,,,,C,C,,Pa,Wh/m2,Wh/m2,Wh/m2,Wh/m2, Wh/m2,Wh/m2,lux,lux,lux,Cd/m2, degrees,m/s,,,km,m,,,mm,thousandths
 1985,3,12, 0,21.7,10.6,49,97400,   0,   0,404,  0,  0,  0,    0,    0,    0,   0,230,10.3,10,10,16.1, 1680,200,0.1270
 1985,3,12, 1,21.1,10.6,51,97300,   0,   0,400,  0,  0,  0,    0,    0,    0,   0,230, 9.3,10,10,16.1, 1520,200,0.1270
@@ -25,3 +25,5 @@ year,month,day,hour,dry_bulb, dew_point, relative_humidity, atmospheric_station_
 1985,3,12,22, 6.7,-3.9,47,98500,   0,   0,270,  0,  0,  0,    0,    0,    0,   0,360, 3.1, 0, 0,24.1,77777, 80,0.0400
 1985,3,12,23, 3.9,-3.3,60,98500,   0,   0,260,  0,  0,  0,    0,    0,    0,   0, 60, 2.6, 0, 0,24.1,77777, 89,0.0400
 1985,3,12,24, 5.0,-3.9,53,98400,   0,   0,263,  0,  0,  0,    0,    0,    0,   0, 70, 3.1, 0, 0,24.1,77777, 89,0.0400
+0}"
+"
