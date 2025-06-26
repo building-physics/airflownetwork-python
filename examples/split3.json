@@ -1,0 +1,199 @@
+{
+    "title": "Simple slow with a three-way split",
+    "global_density": 1.2040973677927915,
+    "nodes": {
+        "inlet": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 15.0,
+            "azimuth": 0.0
+        },
+        "node0": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node1": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node2a": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node2b": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node2c": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node3a": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node3b": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node3c": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node4a": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node4b": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node4c": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "node5": {
+            "height": 0.0,
+            "temperature": 20.0,
+            "volume": 10.0
+        },
+        "outlet": {
+            "variable_pressure": false,
+            "height": 0.0,
+            "temperature": 20.0,
+            "pressure": 5.0,
+            "azimuth": {"value": 270.0, "units": "degrees"}
+        }
+    },
+    "elements": {
+        "plr": {
+            "one": {
+                "nonlinear": 0.005,
+                "exponent": 0.5
+            },
+            "two": {
+                "nonlinear": 0.01,
+                "exponent": 0.5
+            }
+        }
+    },
+    "links": {
+        "link-0": {
+            "node0": "node0",
+            "height0": 0.0,
+            "node1": "inlet",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-1": {
+            "node0": "node0",
+            "height0": 0.0,
+            "node1": "node1",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-2a": {
+            "node0": "node1",
+            "height0": 0.0,
+            "node1": "node2a",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-2b": {
+            "node0": "node1",
+            "height0": 0.0,
+            "node1": "node2b",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-2c": {
+            "node0": "node1",
+            "height0": 0.0,
+            "node1": "node2c",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-3a": {
+            "node0": "node2a",
+            "height0": 0.0,
+            "node1": "node3a",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-3b": {
+            "node0": "node2b",
+            "height0": 0.0,
+            "node1": "node3b",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-3c": {
+            "node0": "node2c",
+            "height0": 0.0,
+            "node1": "node3c",
+            "height1": 0.0,
+            "element": "two"
+        },
+        "link-4a": {
+            "node0": "node3a",
+            "height0": 0.0,
+            "node1": "node4a",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-4b": {
+            "node0": "node3b",
+            "height0": 0.0,
+            "node1": "node4b",
+            "height1": 0.0,
+            "element": "two"
+        },
+        "link-4c": {
+            "node0": "node3c",
+            "height0": 0.0,
+            "node1": "node4c",
+            "height1": 0.0,
+            "element": "two"
+        },
+        "link-5a": {
+            "node0": "node4a",
+            "height0": 0.0,
+            "node1": "node5",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-5b": {
+            "node0": "node4b",
+            "height0": 0.0,
+            "node1": "node5",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-5c": {
+            "node0": "node4c",
+            "height0": 0.0,
+            "node1": "node5",
+            "height1": 0.0,
+            "element": "one"
+        },
+        "link-outlet": {
+            "node0": "node5",
+            "height0": 0.0,
+            "node1": "outlet",
+            "height1": 0.0,
+            "element": "one"
+        }
+    }
+}

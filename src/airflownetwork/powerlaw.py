@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 import math
-from .properties import energyplus_air_density, sutherland_dynamic_viscosity
+from .properties import (energyplus_air_density, density_function, sutherland_dynamic_viscosity, kinematic_viscosity_function,
+                         reference_humidity_ratio, reference_pressure, reference_temperarure)
 
 class PowerLaw:
     """Power law flow element.
@@ -11,15 +12,32 @@ class PowerLaw:
     ----------
     linear: optional
         The linear flow coefficient used in simulation.
-    coefficient: optional
+    nonlinear: optional
         The nonlinear flow coefficient used in simulation.
     exponent: optional
         The nonlinear flow exponent used in simulation.
+    reference_density:
+        The reference density for the element.
+    reference_kinematic_viscosity: optional
+        The reference kinematic viscosity for the element.
+    transition_reynum: optional
+        The transition Reynolds number to use to calculate the linear coefficient (if not specified).
+    dp_min: optional
+        The transition minimum pressure difference to use to calculate the linear coefficient (if not specified).
     """
-    def __init__(self, linear:float=0.0, nonlinear:float=0.0, exponent:float=0.65):
-        self.linear = linear # linear flow coefficient
+    def __init__(self, linear:float|None=None, nonlinear:float=0.0, exponent:float=0.65,
+                 reference_density:float=density_function(reference_pressure, reference_temperarure,
+                                                          reference_humidity_ratio),
+                 reference_kinematic_viscosity:float=kinematic_viscosity_function(reference_pressure, reference_temperarure,
+                                                                                  reference_humidity_ratio),
+                 transition_reynum:float=30.0, dp_min:float=1.0e-10):
         self.nonlinear = nonlinear # nonlinear flow coefficient
         self.exponent = exponent # nonlinear flow exponent
+        # linear flow coefficient
+        if linear is None:
+            self.linear = self.compute_linear_coefficient(reference_density, reference_kinematic_viscosity, transition_reynum, dp_min)
+        else:
+            self.linear = linear 
 
     def type(self):
         """Returns the flow element three-character type.
@@ -110,6 +128,13 @@ class PowerLaw:
             f = mul*sign*ft
             df = f * self.exponent / pdrop
         return 1, f, 0.0, df, 0.0
+    
+    def compute_linear_coefficient(self, reference_density:float, reference_viscosity:float, transition_reynum:float=30.0,
+                                   dp_min:float=1.0e-10):
+        A = self.nonlinear / (0.6 * math.sqrt(2.0))
+        F = reference_viscosity * transition_reynum * math.sqrt(A)
+        pdrop = max(math.pow(F / (self.nonlinear * math.sqrt(reference_density)), 1.0 / self.exponent), dp_min)
+        return reference_viscosity * F / (reference_density * pdrop)
            
 
 class SqrtPowerLaw(PowerLaw):
@@ -117,14 +142,33 @@ class SqrtPowerLaw(PowerLaw):
     
     Parameters
     ----------
-    linear: float
+    linear: optional
         The linear flow coefficient used in simulation.
-    nonlinear: float
+    nonlinear: optional
         The nonlinear flow coefficient used in simulation.
+    exponent: optional
+        The nonlinear flow exponent used in simulation.
+    reference_density:
+        The reference density for the element.
+    reference_kinematic_viscosity: optional
+        The reference kinematic viscosity for the element.
+    transition_reynum: optional
+        The transition Reynolds number to use to calculate the linear coefficient (if not specified).
+    dp_min: optional
+        The transition minimum pressure difference to use to calculate the linear coefficient (if not specified).
     """
-    def __init__(self, linear:float, nonlinear:float):
-        self.linear = linear # linear flow coefficient
+    def __init__(self, linear:float|None=None, nonlinear:float=0.0,
+                 reference_density:float=density_function(reference_pressure, reference_temperarure,
+                                                          reference_humidity_ratio),
+                 reference_kinematic_viscosity:float=kinematic_viscosity_function(reference_pressure, reference_temperarure,
+                                                                                  reference_humidity_ratio),
+                 transition_reynum:float=30.0, dp_min:float=1.0e-10):
         self.nonlinear = nonlinear # nonlinear flow coefficient
+        # linear flow coefficient
+        if linear is None:
+            self.linear = self.compute_linear_coefficient(reference_density, reference_kinematic_viscosity, transition_reynum, dp_min)
+        else:
+            self.linear = linear 
 
     def flow(self, link, pdrop:float, multiplier:float=1.0, control:float=1.0):
         """Compute the flow through the element.
@@ -190,6 +234,13 @@ class SqrtPowerLaw(PowerLaw):
             f = mul*sign*ft
             df = 0.5 * f / pdrop
         return 1, f, 0.0, df, 0.0
+
+    def compute_linear_coefficient(self, reference_density:float, reference_viscosity:float, transition_reynum:float=30.0,
+                                   dp_min:float=1.0e-10):
+        A = self.nonlinear / (0.6 * math.sqrt(2.0))
+        F = reference_viscosity * transition_reynum * math.sqrt(A)
+        pdrop = max((F / (self.nonlinear * math.sqrt(reference_density)))**2, dp_min)
+        return reference_viscosity * F / (reference_density * pdrop)
     
 class Orifice(SqrtPowerLaw):
     """Orifice flow power law flow element.

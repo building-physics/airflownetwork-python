@@ -76,10 +76,12 @@ class Node:
         if azimuth is None:
             self.azimuth = Angle(math.inf, 'radians')
         self.volume = volume
-        self.wind_pressure_profile = wind_pressure_profile
         if wind_pressure_profile is None:
             self.wind_pressure_profile = no_profile
+        else:
+            self.wind_pressure_profile = wind_pressure_profile
         self.added_pressure = 0
+
     def compute_wind_pressure(self, wind_speed:float, wind_direction:Angle):
         angle = wind_direction.degrees - self.azimuth.degrees
         if angle < 0:
@@ -112,7 +114,7 @@ class BadNetwork(Exception):
 class Model(Solver):
     """A class containing nodes, links, and other data representing a pressure network.
     """
-    def __init__(self, nodes, elements, links, global_temperature:float=None, global_density:float=None):
+    def __init__(self, nodes, elements, links, global_temperature:float|None=None, global_density:float|None=None):
         self.nodes = nodes
         self.links = links
         self.elements = elements
@@ -183,7 +185,7 @@ class Model(Solver):
     
     @classmethod
     def from_json(cls, data:dict, element_lookup:dict = object_lookup, node_object:Type[Node]=Node,
-                 link_object:Type[Link]=Link, global_temperature:float=None, global_density:float=None):
+                 link_object:Type[Link]=Link, global_temperature:float|None=None, global_density:float|None=None):
         """Read a model from JSON data.
         
         Parameters
@@ -214,6 +216,7 @@ class Model(Solver):
         elements = {}
         for name, el in data['elements']['plr'].items():
             if el['exponent'] == 0.5:
+                del el['exponent']
                 elements[name] = element_lookup['sqrt_plr'](**el)
             else:
                 elements[name] = element_lookup['plr'](**el)

@@ -3,6 +3,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 import math
 
+reference_pressure = 101325.0
+reference_temperarure = 20.0
+reference_humidity_ratio = 0.0
+
 def energyplus_dynamic_viscosity(temperature:float):
     """Dynamic viscosity of air.
 
@@ -35,6 +39,27 @@ def sutherland_dynamic_viscosity(temperature:float):
     """
     return 1.458-6 * math.pow(temperature + 273.15, 1.5) / (temperature + 383.55)
 
+def sutherland_kinematic_viscosity(pressure:float, temperature:float, humidity_ratio:float=0.0):
+    """Dynamic viscosity of air.
+
+    Sutherland's equation for the dynamic viscosity of air used in EnergyPlus.
+    
+    Parameters
+    ----------
+    pressure: float
+        The air pressure in Pa.
+    temperature: float
+        The air temperature in Celcius.
+    humidty_ratio: float
+        The air humidity ratio.
+
+    Returns
+    -------
+    float
+    """
+    density = energyplus_air_density(pressure, temperature, humidity_ratio)
+    return 1.458-6 * math.pow(temperature + 273.15, 1.5) / ( density * (temperature + 383.55))
+
 def energyplus_air_density(pressure:float, dry_bulb:float, humidity_ratio:float=0.0):
     """Density of air.
 
@@ -57,3 +82,5 @@ def energyplus_air_density(pressure:float, dry_bulb:float, humidity_ratio:float=
     # ASHRAE handbook 1985 Fundamentals, Ch. 6, eqn. (6),(26)
     return (pressure / (287.0 * (dry_bulb + 273.15) * (1.0 + 1.6077687 * max(humidity_ratio, 1.0e-5))))
 
+density_function = energyplus_air_density
+kinematic_viscosity_function = sutherland_kinematic_viscosity
