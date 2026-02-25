@@ -8,3 +8,4 @@ from .wind import TerrainType1993, TerrainType2005
 from .builder import build_network, check_supported_surfaces
 from .bnd import BranchNodeDetails, NodeConnect, NodeConnection
 from .powerlaw import PowerLaw, SqrtPowerLaw, Orifice
+from .interface import AirflowNetworkUtilities
